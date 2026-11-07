@@ -1,0 +1,671 @@
+
+
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="theme-color" content="#173d2b">
+
+<title>Champi de Demain | Encyclopédie des champignons</title>
+
+<meta name="description" content="Explorez les champignons, leurs habitats, leurs saisons et leurs caractéristiques avec Champi de Demain.">
+
+<style>
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+
+  font-family: Arial, sans-serif;
+
+  background: #f5f5ed;
+
+  color: #26372b;
+
+  line-height: 1.6;
+
+}
+
+header {
+
+  background: #173d2b;
+
+  color: white;
+
+  padding: 22px 15px;
+
+  text-align: center;
+
+}
+
+header h1 { font-size: 29px; }
+
+header p { color: #d7e8d5; }
+
+.hero {
+
+  padding: 55px 20px;
+
+  text-align: center;
+
+  background: linear-gradient(140deg,#244d34,#567c4d);
+
+  color: white;
+
+}
+
+.hero h2 {
+
+  font-size: 32px;
+
+  margin-bottom: 15px;
+
+}
+
+.hero p {
+
+  max-width: 600px;
+
+  margin: auto;
+
+}
+
+.search {
+
+  margin: 25px auto 0;
+
+  max-width: 550px;
+
+  display: flex;
+
+  gap: 8px;
+
+}
+
+.search input {
+
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 15px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+
+}
+
+.search button {
+
+  padding: 12px 20px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #e5bd69;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+}
+
+.container {
+
+  max-width: 1050px;
+
+  padding: 35px 18px;
+
+  margin: auto;
+
+}
+
+.section-title {
+
+  text-align: center;
+
+  margin-bottom: 25px;
+
+  color: #244d34;
+
+}
+
+.cards {
+
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+
+  gap: 18px;
+
+}
+
+.card, .result-card {
+
+  background: white;
+
+  border-radius: 12px;
+
+  padding: 22px;
+
+  box-shadow: 0 3px 12px #00000010;
+
+}
+
+.card .emoji { font-size: 38px; }
+
+.card h3 { margin: 10px 0; color: #244d34; }
+
+.card p { color: #59665c; }
+
+.results {
+
+  max-width: 760px;
+
+  margin: 25px auto;
+
+  padding: 0 18px;
+
+}
+
+.result-card { margin-bottom: 14px; }
+
+.result-card h3 { color: #244d34; }
+
+.latin { font-style: italic; color: #68756b; }
+
+.result-card p { margin-top: 8px; }
+
+.info {
+
+  background: #e7eddf;
+
+  border-radius: 12px;
+
+  padding: 24px;
+
+  margin-top: 25px;
+
+}
+
+.warning {
+
+  background: #fff0dc;
+
+  border-left: 5px solid #c47b24;
+
+  padding: 20px;
+
+  margin-top: 25px;
+
+  border-radius: 8px;
+
+}
+
+footer {
+
+  background: #173d2b;
+
+  color: white;
+
+  text-align: center;
+
+  padding: 25px 15px;
+
+  margin-top: 30px;
+
+}
+
+@media(max-width:480px) {
+
+  .search { flex-direction: column; }
+
+  .hero h2 { font-size: 27px; }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+  <h1>🍄 Champi de Demain</h1>
+
+  <p>La nature a tant à nous apprendre</p>
+
+</header>
+
+<section class="hero">
+
+  <h2>Bienvenue dans le monde des champignons</h2>
+
+  <p>
+
+    Découvrez les espèces, explorez les saisons,
+
+    apprenez à observer la nature et partagez
+
+    votre passion des champignons.
+
+  </p>
+
+  <div class="search">
+
+    <input id="recherche" type="search"
+
+      placeholder="Rechercher un champignon..."
+
+      aria-label="Nom du champignon">
+
+    <button type="button" onclick="rechercher()">Chercher</button>
+
+  </div>
+
+</section>
+
+<div id="resultats" class="results" aria-live="polite"></div>
+
+<main class="container">
+
+<h2 class="section-title">Explorez Champi de Demain</h2>
+
+<div class="cards">
+
+<article class="card">
+
+<div class="emoji">🍄</div>
+
+<h3>Encyclopédie</h3>
+
+<p>Découvrez les différentes familles et espèces.</p>
+
+</article>
+
+<article class="card">
+
+<div class="emoji">🌳</div>
+
+<h3>Les saisons</h3>
+
+<p>Comprenez les périodes de développement.</p>
+
+</article>
+
+<article class="card">
+
+<div class="emoji">🌧️</div>
+
+<h3>Météo et nature</h3>
+
+<p>Découvrez les liens entre pluie et pousse.</p>
+
+</article>
+
+<article class="card">
+
+<div class="emoji">📍</div>
+
+<h3>Explorer les régions</h3>
+
+<p>Découvrez les habitats naturels.</p>
+
+</article>
+
+<article class="card">
+
+<div class="emoji">📸</div>
+
+<h3>Reconnaissance</h3>
+
+<p>Un futur outil d'aide à l'observation.</p>
+
+</article>
+
+<article class="card">
+
+<div class="emoji">👥</div>
+
+<h3>Communauté</h3>
+
+<p>Partagez vos observations.</p>
+
+</article>
+
+</div>
+
+<div class="info">
+
+<h2>🌱 Notre ambition</h2>
+
+<p>
+
+Champi de Demain veut devenir une plateforme
+
+de référence pour les passionnés de mycologie,
+
+les curieux et les amoureux de la nature.
+
+</p>
+
+</div>
+
+<div class="warning">
+
+<h3>⚠️ Sécurité avant tout</h3>
+
+<p>
+
+Une recherche ou une photographie ne permet jamais
+
+de garantir la comestibilité d'un champignon.
+
+Ne consommez jamais un champignon sur la seule base
+
+d'une identification par application.
+
+Faites vérifier votre récolte par un pharmacien
+
+ou un spécialiste compétent.
+
+</p>
+
+</div>
+
+</main>
+
+<footer>
+
+<p>🍄 Champi de Demain © 2026</p>
+
+<p>La passion des champignons, autrement.</p>
+
+</footer>
+
+<script>
+
+const champignons = [
+
+{
+
+nom: "Cèpe de Bordeaux",
+
+latin: "Boletus edulis",
+
+aliases: ["cepe", "bolet"],
+
+habitat: "Forêts de feuillus et de conifères.",
+
+saison: "Fin de l'été et automne.",
+
+description: "Bolet au chapeau brun et au pied souvent ventru."
+
+},
+
+{
+
+nom: "Girolle",
+
+latin: "Cantharellus cibarius",
+
+aliases: ["chanterelle"],
+
+habitat: "Bois de feuillus et de conifères.",
+
+saison: "Été et automne.",
+
+description: "Champignon jaune à plis épais sous le chapeau."
+
+},
+
+{
+
+nom: "Amanite tue-mouches",
+
+latin: "Amanita muscaria",
+
+aliases: ["amanite"],
+
+habitat: "Souvent associée aux bouleaux et aux pins.",
+
+saison: "Fin de l'été et automne.",
+
+description: "Chapeau rouge ponctué de flocons blancs. Espèce toxique."
+
+},
+
+{
+
+nom: "Rosé des prés",
+
+latin: "Agaricus campestris",
+
+aliases: ["rose des pres", "agaric"],
+
+habitat: "Prairies et pelouses.",
+
+saison: "Printemps et automne.",
+
+description: "Agaric des milieux ouverts."
+
+},
+
+{
+
+nom: "Pleurote en huître",
+
+latin: "Pleurotus ostreatus",
+
+aliases: ["pleurote"],
+
+habitat: "Souvent sur le bois mort de feuillus.",
+
+saison: "Automne et hiver.",
+
+description: "Champignon poussant en groupes superposés."
+
+},
+
+{
+
+nom: "Morille commune",
+
+latin: "Morchella esculenta",
+
+aliases: ["morille"],
+
+habitat: "Bois clairs et lisières.",
+
+saison: "Printemps.",
+
+description: "Chapeau alvéolé. Les morilles crues sont toxiques."
+
+},
+
+{
+
+nom: "Pied-de-mouton",
+
+latin: "Hydnum repandum",
+
+aliases: ["pied de mouton", "hydne"],
+
+habitat: "Forêts de feuillus et de conifères.",
+
+saison: "Fin de l'été et automne.",
+
+description: "Sous le chapeau se trouvent de petits aiguillons."
+
+},
+
+{
+
+nom: "Coprin chevelu",
+
+latin: "Coprinus comatus",
+
+aliases: ["coprin"],
+
+habitat: "Pelouses et terrains riches en azote.",
+
+saison: "Printemps et automne.",
+
+description: "Chapeau allongé couvert de mèches blanches."
+
+}
+
+];
+
+function rechercher() {
+
+  const champ = document.getElementById("recherche");
+
+  const zone = document.getElementById("resultats");
+
+  const valeur = champ.value.trim();
+
+  zone.replaceChildren();
+
+  if (!valeur) {
+
+    zone.textContent = "Saisissez un nom de champignon.";
+
+    return;
+
+  }
+
+  const normaliser = texte =>
+
+    texte.normalize("NFD")
+
+      .replace(/[\u0300-\u036f]/g, "")
+
+      .toLowerCase();
+
+  const terme = normaliser(valeur);
+
+  const trouves = champignons.filter(espece =>
+
+    normaliser([
+
+      espece.nom,
+
+      espece.latin,
+
+      ...espece.aliases
+
+    ].join(" ")).includes(terme)
+
+  );
+
+  const titre = document.createElement("h2");
+
+  titre.className = "section-title";
+
+  titre.textContent = trouves.length
+
+    ? trouves.length + " résultat(s)"
+
+    : "Aucun résultat";
+
+  zone.appendChild(titre);
+
+  if (!trouves.length) {
+
+    const message = document.createElement("p");
+
+    message.textContent =
+
+      "Aucune fiche trouvée. Essayez cèpe, girolle, pleurote, morille ou amanite.";
+
+    zone.appendChild(message);
+
+    return;
+
+  }
+
+  trouves.forEach(espece => {
+
+    const carte = document.createElement("article");
+
+    carte.className = "result-card";
+
+    const nom = document.createElement("h3");
+
+    nom.textContent = espece.nom;
+
+    const latin = document.createElement("p");
+
+    latin.className = "latin";
+
+    latin.textContent = espece.latin;
+
+    carte.append(nom, latin);
+
+    [
+
+      ["Description", espece.description],
+
+      ["Habitat", espece.habitat],
+
+      ["Saison indicative", espece.saison]
+
+    ].forEach(([label, texte]) => {
+
+      const p = document.createElement("p");
+
+      const strong = document.createElement("strong");
+
+      strong.textContent = label + " : ";
+
+      p.append(strong, document.createTextNode(texte));
+
+      carte.appendChild(p);
+
+    });
+
+    zone.appendChild(carte);
+
+  });
+
+  const avertissement = document.createElement("p");
+
+  avertissement.className = "warning";
+
+  avertissement.textContent =
+
+    "Attention : ces fiches sont informatives. " +
+
+    "Elles ne permettent pas de confirmer la comestibilité. " +
+
+    "Faites vérifier votre récolte par un spécialiste.";
+
+  zone.appendChild(avertissement);
+
+}
+
+document.getElementById("recherche")
+
+  .addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") rechercher();
+
+  });
+
+</script>
+
+</body>
+
+</html>
