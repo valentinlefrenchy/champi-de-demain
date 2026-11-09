@@ -472,6 +472,22 @@ function explorer() {
 
 </script>
 
+
+<script type="module">
+
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const SUPABASE_URL = "https://bydkbesdjrfcrsivmoru.supabase.co";
+
+  const SUPABASE_KEY = "sb_publishable_ohiW4Aeg0fNe0SaQu2FFkQ_anz2PoAO";
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  window.champiSupabase = supabase;
+
+  console.log("Champi de Demain connecté à Supabase !");
+
+</script>
 </body>
 
 </html>
