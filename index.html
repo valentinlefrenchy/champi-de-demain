@@ -487,6 +487,27 @@ function explorer() {
 
   console.log("Champi de Demain connecté à Supabase !");
 
+try {
+  const { data, error } = await supabase
+    .from("mushrooms")
+    .select("id, scientific_name, status")
+    .limit(5);
+
+  if (error) throw error;
+
+  const test = document.createElement("div");
+  test.style.cssText =
+    "position:fixed;bottom:20px;left:10px;right:10px;padding:15px;background:#315b40;color:white;border-radius:12px;z-index:99999";
+
+  test.textContent =
+    "Supabase connecté ! " + data.length + " champignons trouvés.";
+
+  document.body.appendChild(test);
+
+} catch (error) {
+  console.error("Erreur Supabase :", error);
+  alert("Erreur Supabase : " + error.message);
+}
 </script>
 </body>
 
