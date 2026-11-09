@@ -362,6 +362,288 @@ footer {
 
 </footer>
 
+
+<script type="module">
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://bydkbesdjrfcrsivmoru.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_ohiW4Aeg0fNe0SaQu2FFkQ_anz2PoAO";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+window.champiSupabase = supabase;
+
+const speciesGrid = document.getElementById("species-grid");
+
+const speciesStatus = document.getElementById("species-status");
+
+const regionsGrid = document.getElementById("regions-grid");
+
+const regionStatus = document.getElementById("resultat");
+
+function addText(parent, tag, value) {
+
+  const element = document.createElement(tag);
+
+  element.textContent = value ?? "";
+
+  parent.appendChild(element);
+
+}
+
+async function loadMushrooms() {
+
+  speciesStatus.textContent = "Chargement...";
+
+  const { data, error } = await supabase
+
+    .from("mushrooms")
+
+    .select("*");
+
+  if (error) {
+
+    console.error(error);
+
+    speciesStatus.textContent = "Erreur de chargement des champignons.";
+
+    return;
+
+  }
+
+  speciesGrid.replaceChildren();
+
+  if (!data.length) {
+
+    speciesStatus.textContent = "Aucun champignon enregistré pour le moment.";
+
+    return;
+
+  }
+
+  speciesStatus.textContent = data.length + " champignons trouvés.";
+
+  data.forEach(mushroom => {
+
+    const card = document.createElement("article");
+
+    card.className = "card";
+
+    const content = document.createElement("div");
+
+    content.className = "card-content";
+
+    addText(content, "h3",
+
+      mushroom.common_name ||
+
+      mushroom.name ||
+
+      mushroom.scientific_name ||
+
+      "Champignon"
+
+    );
+
+    if (mushroom.scientific_name) {
+
+      const scientific = document.createElement("p");
+
+      scientific.className = "scientific";
+
+      scientific.textContent = mushroom.scientific_name;
+
+      content.appendChild(scientific);
+
+    }
+
+    if (mushroom.description) {
+
+      addText(content, "p", mushroom.description);
+
+    }
+
+    if (mushroom.habitat) {
+
+      addText(content, "p", "Habitat : " + mushroom.habitat);
+
+    }
+
+    addText(content, "p",
+
+      "Identification à confirmer par un spécialiste."
+
+    );
+
+    card.appendChild(content);
+
+    speciesGrid.appendChild(card);
+
+  });
+
+}
+
+async function loadRegions() {
+
+  regionStatus.textContent = "Chargement des territoires...";
+
+  const { data, error } = await supabase
+
+    .from("regions")
+
+    .select("*");
+
+  if (error) {
+
+    console.error(error);
+
+    regionStatus.textContent = "Erreur de chargement des territoires.";
+
+    return;
+
+  }
+
+  regionsGrid.replaceChildren();
+
+  if (!data.length) {
+
+    regionStatus.textContent = "Aucun territoire enregistré.";
+
+    return;
+
+  }
+
+  regionStatus.textContent =
+
+    data.length + " territoires chargés.";
+
+  data.forEach(region => {
+
+    const card = document.createElement("article");
+
+    card.className = "card";
+
+    const content = document.createElement("div");
+
+    content.className = "card-content";
+
+    addText(content, "h3",
+
+      region.name || region.nom || "Territoire"
+
+    );
+
+    if (region.description) {
+
+      addText(content, "p", region.description);
+
+    }
+
+    card.appendChild(content);
+
+    regionsGrid.appendChild(card);
+
+  });
+
+}
+
+document.getElementById("search-region")
+
+.addEventListener("click", async () => {
+
+  const postal = document.getElementById("postal")
+
+    .value.trim();
+
+  if (!/^\d{5}$/.test(postal)) {
+
+    regionStatus.textContent =
+
+      "Saisissez un code postal à 5 chiffres.";
+
+    return;
+
+  }
+
+  regionStatus.textContent =
+
+    "Recherche du code postal " + postal + "...";
+
+  const { data, error } = await supabase
+
+    .from("regions")
+
+    .select("*")
+
+    .eq("postal_code", postal);
+
+  if (error) {
+
+    console.error(error);
+
+    regionStatus.textContent =
+
+      "Erreur pendant la recherche. Vérifiez la structure de la table regions.";
+
+    return;
+
+  }
+
+  regionsGrid.replaceChildren();
+
+  if (!data.length) {
+
+    regionStatus.textContent =
+
+      "Aucun territoire trouvé pour ce code postal.";
+
+    return;
+
+  }
+
+  regionStatus.textContent =
+
+    data.length + " résultat(s) trouvé(s).";
+
+  data.forEach(region => {
+
+    const card = document.createElement("article");
+
+    card.className = "card";
+
+    const content = document.createElement("div");
+
+    content.className = "card-content";
+
+    addText(content, "h3", region.name || region.nom || "Territoire");
+
+    if (region.description) {
+
+      addText(content, "p", region.description);
+
+    }
+
+    card.appendChild(content);
+
+    regionsGrid.appendChild(card);
+
+  });
+
+});
+
+await Promise.all([
+
+  loadMushrooms(),
+
+  loadRegions()
+
+]);
+
+console.log("Champi de Demain : Supabase initialisé.");
+
+</script>
 </body>
 
 </html>
