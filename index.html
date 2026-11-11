@@ -1,0 +1,515 @@
+<!doctype html>
+
+<html lang="fr">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="theme-color" content="#183d2c">
+
+<meta name="description" content="Champi de Demain : encyclopédie pédagogique des champignons, saisons et territoires.">
+
+<title>Champi de Demain — Explorer la nature</title>
+
+<style>
+
+:root{--forest:#183d2c;--cream:#f6f3e9;--gold:#d6ae69;--ink:#26352b;--muted:#667267;--paper:#fffefa}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Georgia,serif}
+
+header{background:var(--forest);color:white;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+
+.logo{font-size:23px;font-weight:bold}.logo span{color:var(--gold)}
+
+nav{display:flex;gap:16px;flex-wrap:wrap}
+
+nav a{color:white;text-decoration:none}
+
+.hero{color:white;padding:clamp(65px,10vw,110px) 8%;min-height:390px;background:linear-gradient(90deg,rgba(15,40,27,.94),rgba(15,40,27,.45)),url("https://images.unsplash.com/photo-1504545102780-26774c1bb073?w=1600") center/cover}
+
+.hero h1{font-size:clamp(36px,6vw,62px);max-width:760px}
+
+.hero p{font-size:19px;line-height:1.65;max-width:650px}
+
+.btn{display:inline-block;background:var(--gold);color:#17291d;padding:13px 20px;border:0;border-radius:6px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:16px}
+
+section{padding:52px 8%}
+
+h2{color:var(--forest);font-size:clamp(27px,4vw,34px)}
+
+.intro{max-width:760px;line-height:1.7;color:#48564b}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr));gap:18px;margin-top:24px}
+
+.card{background:var(--paper);border:1px solid #e7e4d9;border-radius:12px;overflow:hidden;box-shadow:0 5px 18px #17291d0a}
+
+.card-content{padding:19px}
+
+.card h3{color:var(--forest);margin:0 0 8px;font-size:21px}
+
+.scientific{font-style:italic;color:var(--muted)}
+
+.tag{display:inline-block;background:#edf1e8;color:var(--forest);border-radius:20px;padding:5px 9px;font:12px Arial,sans-serif;margin:3px 4px 3px 0}
+
+.tag.warn{background:#fff0d9;color:#7b4512}
+
+.tag.danger{background:#f8e5e2;color:#8b211b}
+
+.search-area{background:#e9e8dc;border-radius:12px;padding:22px;max-width:680px;margin-top:22px}
+
+input{width:100%;padding:14px;border:1px solid #a9afa4;border-radius:6px;margin:10px 0 14px;font-size:17px;background:white}
+
+.data-status{line-height:1.6;margin:16px 0;color:#465449}
+
+.error{color:#9b2828}
+
+.warning{background:#fff0d9;border-left:5px solid #c28a35;padding:19px;line-height:1.65;border-radius:5px}
+
+footer{background:var(--forest);color:white;padding:32px 8%;line-height:1.8}
+
+@media(max-width:600px){header{padding:17px 5%}nav{gap:12px}.hero{padding:65px 6%}section{padding:39px 6%}}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">🍄 Champi <span>de Demain</span></div>
+
+<nav aria-label="Navigation">
+
+<a href="#explorer">Champignons</a>
+
+<a href="#territoire">Territoires</a>
+
+<a href="#saisons">Saisons</a>
+
+<a href="#ecole">Apprendre</a>
+
+<a href="#securite">Sécurité</a>
+
+</nav>
+
+</header>
+
+<main>
+
+<section class="hero">
+
+<h1>La nature a encore beaucoup à nous apprendre.</h1>
+
+<p>Explorez les champignons, découvrez leurs habitats, les saisons et les secrets des forêts françaises.</p>
+
+<a href="#explorer" class="btn">Partir à la découverte</a>
+
+</section>
+
+<section id="explorer">
+
+<h2>Notre encyclopédie</h2>
+
+<p class="intro">Découvrez les premières fiches de notre bibliothèque. Les informations sont pédagogiques et ne valident jamais la comestibilité.</p>
+
+<p id="species-status" class="data-status">Chargement des fiches…</p>
+
+<div id="species-grid" class="grid"></div>
+
+</section>
+
+<section id="territoire" style="background:#e9e8dc">
+
+<h2>Explorer son territoire</h2>
+
+<p class="intro">Recherchez une commune enregistrée à partir de son code postal.</p>
+
+<div class="search-area">
+
+<label for="postal"><strong>Votre code postal</strong></label>
+
+<input id="postal" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="Exemple : 82100">
+
+<button class="btn" id="search-region" type="button">Rechercher</button>
+
+<p id="region-status" class="data-status" aria-live="polite"></p>
+
+</div>
+
+<div id="regions-grid" class="grid"></div>
+
+</section>
+
+<section id="saisons">
+
+<h2>Le calendrier des saisons</h2>
+
+<p class="intro">Périodes indicatives : la pousse dépend des pluies, des températures, des sols et des milieux. Elles ne prédisent pas une présence locale.</p>
+
+<p id="season-status" class="data-status">Chargement du calendrier…</p>
+
+<div id="seasons-grid" class="grid"></div>
+
+</section>
+
+<section id="ecole">
+
+<h2>L’école du cueilleur</h2>
+
+<p class="intro">Apprenez à observer sans vous précipiter : chaque détail compte et une photo ne suffit jamais à garantir une identification.</p>
+
+<div class="grid">
+
+<article class="card"><div class="card-content"><h3>01 — Observer</h3><p>Forme, couleur, chapeau, pied, lamelles ou pores, anneau, volve et sporée.</p></div></article>
+
+<article class="card"><div class="card-content"><h3>02 — Comprendre</h3><p>Les sols, les arbres associés, les habitats et les conditions climatiques.</p></div></article>
+
+<article class="card"><div class="card-content"><h3>03 — Préserver</h3><p>Respecter les milieux naturels, les propriétés et les réglementations locales.</p></div></article>
+
+</div>
+
+</section>
+
+<section id="securite">
+
+<h2>La sécurité avant tout</h2>
+
+<div class="warning"><strong>Attention :</strong> ce site est pédagogique. Il ne permet pas de déterminer si un champignon est comestible. Ne consommez jamais un champignon sur la base d’une photographie ou d’une identification automatique. En cas de doute, demandez l’avis d’un pharmacien ou d’un mycologue. En cas d’ingestion suspectée, contactez immédiatement un centre antipoison ou le 15 / 112.</div>
+
+</section>
+
+</main>
+
+<footer>
+
+<strong>Champi de Demain</strong><br>
+
+Découvrir. Comprendre. Préserver.
+
+<p>Projet indépendant en développement — données et périodes à vérifier et enrichir.</p>
+
+<small>© 2026 Champi de Demain</small>
+
+</footer>
+
+<script type="module">
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://bydkbesdjrfcrsivmoru.supabase.co";
+
+const SUPABASE_KEY = "REMPLACER_PAR_VOTRE_CLE_PUBLIABLE_SUPABASE";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+
+function addText(parent, tag, value) {
+
+  const el = document.createElement(tag);
+
+  el.textContent = value ?? "";
+
+  parent.appendChild(el);
+
+  return el;
+
+}
+
+function showError(el, msg) {
+
+  el.textContent = msg;
+
+  el.classList.add("error");
+
+}
+
+function safety(value) {
+
+  if (value === "deadly") return ["Mortel — danger majeur", "danger"];
+
+  if (value === "toxic") return ["Toxique — ne pas consommer", "danger"];
+
+  return ["Comestibilité non renseignée", "warn"];
+
+}
+
+async function loadMushrooms() {
+
+  const status = $("species-status");
+
+  const grid = $("species-grid");
+
+  const { data, error } = await supabase
+
+    .from("mushrooms")
+
+    .select("id,scientific_name,common_names,description,habitat,edibility,status")
+
+    .order("scientific_name");
+
+  if (error) {
+
+    console.error(error);
+
+    showError(status, "Chargement impossible : vérifiez les droits de lecture Supabase.");
+
+    return;
+
+  }
+
+  grid.replaceChildren();
+
+  if (!data?.length) {
+
+    status.textContent = "Aucun champignon enregistré.";
+
+    return;
+
+  }
+
+  status.textContent = data.length + " fiches chargées.";
+
+  for (const m of data) {
+
+    const card = document.createElement("article");
+
+    card.className = "card";
+
+    const c = document.createElement("div");
+
+    c.className = "card-content";
+
+    const names = Array.isArray(m.common_names) ? m.common_names : [];
+
+    addText(c, "h3", names[0] || m.scientific_name);
+
+    addText(c, "p", m.scientific_name).className = "scientific";
+
+    const [label, cls] = safety(m.edibility);
+
+    addText(c, "span", label).className = "tag " + cls;
+
+    addText(c, "span", m.status === "draft" ? "Fiche en brouillon" : "Fiche publiée").className = "tag";
+
+    if (m.description) addText(c, "p", m.description);
+
+    if (m.habitat) addText(c, "p", "Habitat indicatif : " + m.habitat);
+
+    addText(c, "p", "Identification à confirmer par un spécialiste. Aucune consommation ne peut être validée par cette fiche.");
+
+    card.appendChild(c);
+
+    grid.appendChild(card);
+
+  }
+
+}
+
+function renderRegions(data) {
+
+  const grid = $("regions-grid");
+
+  grid.replaceChildren();
+
+  for (const r of data) {
+
+    const card = document.createElement("article");
+
+    card.className = "card";
+
+    const c = document.createElement("div");
+
+    c.className = "card-content";
+
+    addText(c, "h3", r.name);
+
+    if (r.postal_code) addText(c, "p", "Code postal : " + r.postal_code);
+
+    if (r.description) addText(c, "p", r.description);
+
+    card.appendChild(c);
+
+    grid.appendChild(card);
+
+  }
+
+}
+
+async function loadRegions() {
+
+  const status = $("region-status");
+
+  const { data, error } = await supabase
+
+    .from("regions")
+
+    .select("id,name,postal_code,description")
+
+    .order("name");
+
+  if (error) {
+
+    console.error(error);
+
+    showError(status, "Impossible de charger les territoires. Vérifiez les droits Supabase.");
+
+    return;
+
+  }
+
+  status.textContent = data.length + " territoires disponibles.";
+
+  renderRegions(data.filter(r => r.postal_code));
+
+}
+
+async function searchRegion() {
+
+  const status = $("region-status");
+
+  const postal = $("postal").value.trim();
+
+  status.classList.remove("error");
+
+  if (!/^\d{5}$/.test(postal)) {
+
+    showError(status, "Saisissez un code postal à 5 chiffres.");
+
+    return;
+
+  }
+
+  status.textContent = "Recherche en cours…";
+
+  const { data, error } = await supabase
+
+    .from("regions")
+
+    .select("id,name,postal_code,description")
+
+    .eq("postal_code", postal)
+
+    .order("name");
+
+  if (error) {
+
+    console.error(error);
+
+    showError(status, "Erreur de recherche : vérifiez les droits Supabase.");
+
+    return;
+
+  }
+
+  renderRegions(data);
+
+  status.textContent = data.length
+
+    ? data.length + " commune(s) trouvée(s)."
+
+    : "Aucune commune enregistrée pour ce code postal.";
+
+}
+
+async function loadSeasons() {
+
+  const status = $("season-status");
+
+  const grid = $("seasons-grid");
+
+  const { data, error } = await supabase
+
+    .from("seasons")
+
+    .select("month,conditions,mushrooms(scientific_name,common_names)")
+
+    .order("month");
+
+  if (error) {
+
+    console.error(error);
+
+    showError(status, "Impossible de charger les saisons. Vérifiez les droits Supabase.");
+
+    return;
+
+  }
+
+  grid.replaceChildren();
+
+  if (!data?.length) {
+
+    status.textContent = "Aucune période enregistrée.";
+
+    return;
+
+  }
+
+  status.textContent = data.length + " périodes indicatives chargées.";
+
+  const months = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+
+  for (const s of data) {
+
+    const card = document.createElement("article");
+
+    card.className = "card";
+
+    const c = document.createElement("div");
+
+    c.className = "card-content";
+
+    const m = s.mushrooms || {};
+
+    const names = Array.isArray(m.common_names) ? m.common_names : [];
+
+    addText(c, "h3", names[0] || m.scientific_name || "Champignon");
+
+    addText(c, "p", months[s.month - 1] || "Mois non renseigné");
+
+    if (s.conditions) addText(c, "p", s.conditions);
+
+    card.appendChild(c);
+
+    grid.appendChild(card);
+
+  }
+
+}
+
+$("search-region").addEventListener("click", searchRegion);
+
+$("postal").addEventListener("keydown", e => {
+
+  if (e.key === "Enter") searchRegion();
+
+});
+
+if (SUPABASE_KEY.startsWith("sb_publishable_")) {
+
+  await Promise.all([loadMushrooms(), loadRegions(), loadSeasons()]);
+
+} else {
+
+  $("species-status").textContent = "Configuration requise : ajoutez votre clé publiable Supabase dans index.html.";
+
+  $("region-status").textContent = "Configuration Supabase requise.";
+
+  $("season-status").textContent = "Configuration Supabase requise.";
+
+}
+
+</script>
+
+</body>
+
+</html>
