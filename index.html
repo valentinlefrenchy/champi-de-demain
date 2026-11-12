@@ -136,9 +136,27 @@ footer{background:var(--forest);color:white;padding:32px 8%;line-height:1.8}
 
 <label for="postal"><strong>Votre code postal</strong></label>
 
-<input id="postal" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="Exemple : 82100">
+<input id="postal" type="text" inputmode="numeric"
 
-<button class="btn" id="search-region" type="button">Rechercher</button>
+autocomplete="postal-code" maxlength="5" placeholder="Exemple : 82100">
+
+<label for="radius"><strong>Rayon de recherche</strong></label>
+
+<select id="radius" style="width:100%;padding:14px;border-radius:6px;font-size:17px;margin:10px 0 14px">
+
+<option value="5">5 km</option>
+
+<option value="10">10 km</option>
+
+<option value="20" selected>20 km</option>
+
+<option value="30">30 km</option>
+
+<option value="50">50 km</option>
+
+</select>
+
+<button class="btn" id="search-region" type="button">Explorer mon secteur</button>
 
 <p id="region-status" class="data-status" aria-live="polite"></p>
 
