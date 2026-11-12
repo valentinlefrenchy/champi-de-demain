@@ -390,53 +390,39 @@ async function loadRegions() {
 
 }
 
+
 async function searchRegion() {
-
   const status = $("region-status");
-
   const postal = $("postal").value.trim();
+  const radius = Number($("radius").value);
 
   status.classList.remove("error");
 
   if (!/^\d{5}$/.test(postal)) {
-
     showError(status, "Saisissez un code postal à 5 chiffres.");
-
     return;
-
   }
 
-  status.textContent = "Recherche en cours…";
+  status.textContent = "Calcul de votre secteur…";
 
-  const { data, error } = await supabase
-
-    .from("regions")
-
-    .select("id,name,postal_code,description")
-
-    .eq("postal_code", postal)
-
-    .order("name");
+  const { data, error } = await supabase.rpc("nearby_regions", {
+    p_postal_code: postal,
+    p_radius_km: radius
+  });
 
   if (error) {
-
     console.error(error);
-
-    showError(status, "Erreur de recherche : vérifiez les droits Supabase.");
-
+    showError(status, "Erreur de recherche géographique.");
     return;
-
   }
 
-  renderRegions(data);
+  renderRegions(data || []);
 
   status.textContent = data.length
-
-    ? data.length + " commune(s) trouvée(s)."
-
-    : "Aucune commune enregistrée pour ce code postal.";
-
+    ? data.length + " commune(s) dans un rayon de " + radius + " km."
+    : "Aucune commune enregistrée dans ce rayon.";
 }
+
 
 async function loadSeasons() {
 
