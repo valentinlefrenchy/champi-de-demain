@@ -272,6 +272,7 @@ async function loadMushrooms() {
 
     .select("id,scientific_name,common_names,description,habitat,edibility,status")
 
+    .eq("status", "published")
     .order("scientific_name");
 
   if (error) {
@@ -288,7 +289,7 @@ async function loadMushrooms() {
 
   if (!data?.length) {
 
-    status.textContent = "Aucun champignon enregistré.";
+    status.textContent = "Aucune fiche publiée pour le moment.";
 
     return;
 
