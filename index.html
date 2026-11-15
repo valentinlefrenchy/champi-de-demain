@@ -498,41 +498,6 @@ async function loadRegions() {
   if (error) {
 
     console.error(error);
-    function createObservation() {
-  const result = $("observation-result");
-  result.replaceChildren();
-
-  const fields = [
-    ["Milieu", $("obs-habitat").value],
-    ["Sous le chapeau", $("obs-under").value],
-    ["Forme du chapeau", $("obs-cap").value],
-    ["Pied", $("obs-stem").value],
-    ["Anneau et volve", $("obs-ring").value],
-    ["Autres détails", $("obs-color").value.trim()]
-  ];
-
-  addText(result, "h3", "Ma fiche d'observation");
-
-  const list = document.createElement("ul");
-
-  for (const [label, value] of fields) {
-    const item = document.createElement("li");
-    item.textContent = label + " : " + (value || "Non renseigné");
-    list.appendChild(item);
-  }
-
-  result.appendChild(list);
-
-  addText(result, "p",
-    "Fiche descriptive uniquement : elle ne permet pas d'identifier avec certitude le champignon ni de confirmer sa comestibilité."
-  );
-}
-
-$("create-observation").addEventListener("click", createObservation);
-
-    showError(status, "Impossible de charger les territoires. Vérifiez les droits Supabase.");
-
-    return;
 
   }
 
@@ -645,6 +610,41 @@ async function loadSeasons() {
   }
 
 }
+    function createObservation() {
+  const result = $("observation-result");
+  result.replaceChildren();
+
+  const fields = [
+    ["Milieu", $("obs-habitat").value],
+    ["Sous le chapeau", $("obs-under").value],
+    ["Forme du chapeau", $("obs-cap").value],
+    ["Pied", $("obs-stem").value],
+    ["Anneau et volve", $("obs-ring").value],
+    ["Autres détails", $("obs-color").value.trim()]
+  ];
+
+  addText(result, "h3", "Ma fiche d'observation");
+
+  const list = document.createElement("ul");
+
+  for (const [label, value] of fields) {
+    const item = document.createElement("li");
+    item.textContent = label + " : " + (value || "Non renseigné");
+    list.appendChild(item);
+  }
+
+  result.appendChild(list);
+
+  addText(result, "p",
+    "Fiche descriptive uniquement : elle ne permet pas d'identifier avec certitude le champignon ni de confirmer sa comestibilité."
+  );
+}
+
+$("create-observation").addEventListener("click", createObservation);
+
+    showError(status, "Impossible de charger les territoires. Vérifiez les droits Supabase.");
+
+    return;
 
 $("search-region").addEventListener("click", searchRegion);
 
