@@ -196,6 +196,123 @@ autocomplete="postal-code" maxlength="5" placeholder="Exemple : 82100">
 
 </section>
 
+
+<section id="observation">
+
+<h2>Mon carnet d’observation</h2>
+
+<p class="intro">Prenez le temps de décrire votre découverte. Chaque détail peut aider un spécialiste à étudier le champignon.</p>
+
+<div class="search-area">
+
+<label for="obs-habitat"><strong>1. Où l'avez-vous trouvé ?</strong></label>
+
+<select id="obs-habitat">
+
+<option value="">Choisir un milieu</option>
+
+<option>Forêt de feuillus</option>
+
+<option>Forêt de conifères</option>
+
+<option>Forêt mixte</option>
+
+<option>Prairie ou pâturage</option>
+
+<option>Jardin ou parc</option>
+
+<option>Autre milieu</option>
+
+</select>
+
+<label for="obs-under"><strong>2. Que voyez-vous sous le chapeau ?</strong></label>
+
+<select id="obs-under">
+
+<option value="">Choisir une observation</option>
+
+<option>Des lamelles</option>
+
+<option>Des petits tubes ou pores</option>
+
+<option>Des aiguillons ou dents</option>
+
+<option>Surface lisse</option>
+
+<option>Je ne sais pas</option>
+
+</select>
+
+<label for="obs-cap"><strong>3. Quelle est la forme du chapeau ?</strong></label>
+
+<select id="obs-cap">
+
+<option value="">Choisir une forme</option>
+
+<option>Arrondi ou bombé</option>
+
+<option>Plat ou étalé</option>
+
+<option>En entonnoir</option>
+
+<option>En cloche</option>
+
+<option>Irrégulier</option>
+
+<option>Je ne sais pas</option>
+
+</select>
+
+<label for="obs-stem"><strong>4. Décrivez le pied</strong></label>
+
+<select id="obs-stem">
+
+<option value="">Choisir une observation</option>
+
+<option>Fin et élancé</option>
+
+<option>Épais et robuste</option>
+
+<option>Creux</option>
+
+<option>Bulbeux à la base</option>
+
+<option>Sans pied apparent</option>
+
+<option>Je ne sais pas</option>
+
+</select>
+
+<label for="obs-ring"><strong>5. Voyez-vous un anneau ou une volve ?</strong></label>
+
+<select id="obs-ring">
+
+<option value="">Choisir une réponse</option>
+
+<option>Anneau visible</option>
+
+<option>Volve visible à la base</option>
+
+<option>Les deux</option>
+
+<option>Aucun observé</option>
+
+<option>Je ne sais pas</option>
+
+</select>
+
+<label for="obs-color"><strong>6. Couleur et autres détails</strong></label>
+
+<textarea id="obs-color" rows="3" placeholder="Couleur du chapeau, odeur, taille, arbres proches, détails particuliers…"></textarea>
+
+<button class="btn" id="create-observation" type="button">Créer ma fiche d’observation</button>
+
+<div id="observation-result" class="data-status" aria-live="polite"></div>
+
+</div>
+
+</section>
+
 <section id="securite">
 
 <h2>La sécurité avant tout</h2>
@@ -381,6 +498,37 @@ async function loadRegions() {
   if (error) {
 
     console.error(error);
+    function createObservation() {
+  const result = $("observation-result");
+  result.replaceChildren();
+
+  const fields = [
+    ["Milieu", $("obs-habitat").value],
+    ["Sous le chapeau", $("obs-under").value],
+    ["Forme du chapeau", $("obs-cap").value],
+    ["Pied", $("obs-stem").value],
+    ["Anneau et volve", $("obs-ring").value],
+    ["Autres détails", $("obs-color").value.trim()]
+  ];
+
+  addText(result, "h3", "Ma fiche d'observation");
+
+  const list = document.createElement("ul");
+
+  for (const [label, value] of fields) {
+    const item = document.createElement("li");
+    item.textContent = label + " : " + (value || "Non renseigné");
+    list.appendChild(item);
+  }
+
+  result.appendChild(list);
+
+  addText(result, "p",
+    "Fiche descriptive uniquement : elle ne permet pas d'identifier avec certitude le champignon ni de confirmer sa comestibilité."
+  );
+}
+
+$("create-observation").addEventListener("click", createObservation);
 
     showError(status, "Impossible de charger les territoires. Vérifiez les droits Supabase.");
 
