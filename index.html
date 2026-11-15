@@ -338,29 +338,31 @@ function renderRegions(data) {
 
   grid.replaceChildren();
 
-  for (const r of data) {
+  for (const r of data || []) {
 
     const card = document.createElement("article");
-
     card.className = "card";
 
     const c = document.createElement("div");
-
     c.className = "card-content";
 
     addText(c, "h3", r.name);
 
-    if (r.distance_km !== undefined) {
-  addText(c, "p", "Distance : " + r.distance_km + " km");
+    if (r.distance_km !== undefined && r.distance_km !== null) {
+      addText(c, "p", "Distance : " + r.distance_km + " km");
+    }
 
-    if (r.description) addText(c, "p", r.description);
+    if (r.postal_code) {
+      addText(c, "p", "Code postal : " + r.postal_code);
+    }
+
+    if (r.description) {
+      addText(c, "p", r.description);
+    }
 
     card.appendChild(c);
-
     grid.appendChild(card);
-
   }
-
 }
 
 async function loadRegions() {
