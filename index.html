@@ -419,10 +419,14 @@ async function searchRegion() {
     return;
   }
 
-  renderRegions(data || []);
+    const sortedData = (data || []).slice().sort(
+    (a, b) => Number(a.distance_km) - Number(b.distance_km)
+  );
 
-  status.textContent = data.length
-    ? data.length + " commune(s) dans un rayon de " + radius + " km."
+  renderRegions(sortedData);
+
+  status.textContent = sortedData.length
+    ? sortedData.length + " commune(s) dans un rayon de " + radius + " km."
     : "Aucune commune enregistrée dans ce rayon.";
 }
 
