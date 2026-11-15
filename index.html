@@ -496,9 +496,9 @@ async function loadRegions() {
     .order("name");
 
   if (error) {
-
     console.error(error);
-
+    showError(status, "Impossible de charger les territoires. Vérifiez les droits Supabase.");
+    return;
   }
 
   status.textContent = data.length + " territoires disponibles.";
