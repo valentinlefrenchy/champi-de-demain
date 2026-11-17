@@ -821,7 +821,26 @@ async function loadSeasons() {
   }
 
   result.appendChild(list);
+$("obs-photo").addEventListener("change", event => {
+  const file = event.target.files[0];
+  const preview = $("obs-photo-preview");
 
+  if (!file) {
+    preview.hidden = true;
+    preview.removeAttribute("src");
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    alert("Choisissez une image.");
+    event.target.value = "";
+    preview.hidden = true;
+    return;
+  }
+
+  preview.src = URL.createObjectURL(file);
+  preview.hidden = false;
+});
   addText(result, "p",
     "Fiche descriptive uniquement : elle ne permet pas d'identifier avec certitude le champignon ni de confirmer sa comestibilité."
   );
