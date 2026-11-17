@@ -384,7 +384,12 @@ autocomplete="postal-code" maxlength="5" placeholder="Exemple : 82100">
 </p>
 
 <div class="search-area">
+<label for="obs-photo"><strong>Ajouter une photo de votre champignon</strong></label>
 
+<input id="obs-photo" type="file" accept="image/*" capture="environment">
+
+<img id="obs-photo-preview" alt="Aperçu de votre photo" hidden
+style="width:100%;max-width:500px;border-radius:12px;margin:15px 0;">
 <label for="obs-habitat"><strong>1. Où l'avez-vous trouvé ?</strong></label>
 
 <select id="obs-habitat">
