@@ -21,15 +21,15 @@ const TYPES = {
 const $ = id => document.getElementById(id);
 
 function node(tag, text, cls) {
-  const n = document.createElement(tag);
-  if (text) n.textContent = text;
-  if (cls) n.className = cls;
-  return n;
+  const element = document.createElement(tag);
+  if (text) element.textContent = text;
+  if (cls) element.className = cls;
+  return element;
 }
 
-function message(el, text, error = false) {
-  el.textContent = text;
-  el.classList.toggle("error", error);
+function message(element, text, error = false) {
+  element.textContent = text;
+  element.classList.toggle("error", error);
 }
 
 function makeInput(id, type, placeholder, autocomplete) {
@@ -39,33 +39,77 @@ function makeInput(id, type, placeholder, autocomplete) {
   input.placeholder = placeholder;
   input.autocomplete = autocomplete;
   input.style.cssText =
-    "display:block;width:100%;box-sizing:border-box;margin:10px 0;padding:14px;border:1px solid #aeb7a9;border-radius:10px;font:inherit";
+    "display:block;width:100%;box-sizing:border-box;margin:9px 0;padding:13px 15px;border:1px solid #c6cbbb;border-radius:10px;background:#fffefa;color:#26352b;font:16px Arial,sans-serif";
   return input;
 }
 
-function makeButton(id, text, cls = "btn secondary") {
-  const button = node("button", text, cls);
+function makeButton(id, text, primary = false) {
+  const button = node("button", text);
   button.id = id;
   button.type = "button";
+  button.style.cssText = primary
+    ? "display:block;width:100%;padding:13px 16px;margin:9px 0;border:1px solid #183d2c;border-radius:10px;background:#183d2c;color:white;font:bold 16px Arial,sans-serif;cursor:pointer"
+    : "display:block;width:100%;padding:12px 16px;margin:9px 0;border:1px solid #183d2c;border-radius:10px;background:#fffefa;color:#183d2c;font:bold 15px Arial,sans-serif;cursor:pointer";
   return button;
 }
 
 function setupPanel() {
-  const area = $("observation")?.querySelector(".search-area");
-  if (!area || $("champi-account")) return;
+  const main = document.querySelector("main");
+  if (!main || $("champi-account")) return;
 
   const panel = node("section");
   panel.id = "champi-account";
   panel.style.cssText =
-    "background:#fffefa;border:1px solid #e7e4d9;border-radius:12px;padding:20px;margin-bottom:24px";
+    "padding:22px 6%;background:#f6f3e9;border-bottom:1px solid #e2dfd2";
 
-  panel.appendChild(node("h3", "Mon compte Champi de Demain"));
-  panel.appendChild(
-    node(
-      "p",
-      "Connectez-vous pour enregistrer vos observations et retrouver votre carnet sur vos appareils."
-    )
+  const card = node("div");
+  card.style.cssText =
+    "max-width:850px;margin:0 auto;padding:20px 22px;background:#fffefa;border:1px solid #e4e2d7;border-radius:16px;box-shadow:0 5px 20px rgba(24,61,44,.07)";
+
+  const heading = node("div");
+  heading.style.cssText =
+    "display:flex;align-items:center;gap:10px;margin-bottom:5px";
+
+  const icon = node("span", "🍄");
+  icon.style.fontSize = "25px";
+
+  const title = node("h2", "Mon espace personnel");
+  title.style.cssText =
+    "margin:0;color:#183d2c;font-size:23px";
+
+  heading.append(icon, title);
+  card.append(heading);
+
+  const intro = node(
+    "p",
+    "Connectez-vous pour retrouver votre carnet et enregistrer vos observations."
   );
+  intro.style.cssText =
+    "margin:7px 0 16px;color:#667267;font:15px/1.5 Arial,sans-serif";
+  card.append(intro);
+
+  const choices = node("div");
+  choices.style.cssText =
+    "display:grid;grid-template-columns:1fr 1fr;gap:10px";
+
+  const openLogin = makeButton(
+    "champi-open-login",
+    "Se connecter",
+    true
+  );
+
+  const openSignup = makeButton(
+    "champi-open-signup",
+    "Créer un compte"
+  );
+
+  choices.append(openLogin, openSignup);
+  card.append(choices);
+
+  const form = node("div");
+  form.id = "champi-auth-form";
+  form.hidden = true;
+  form.style.marginTop = "14px";
 
   const email = makeInput(
     "champi-email",
@@ -77,7 +121,7 @@ function setupPanel() {
   const password = makeInput(
     "champi-password",
     "password",
-    "Mot de passe (8 caractères minimum)",
+    "Mot de passe",
     "current-password"
   );
 
@@ -87,44 +131,55 @@ function setupPanel() {
     "Confirmer le mot de passe",
     "new-password"
   );
-
-  // La confirmation est cachée au départ.
   passwordConfirm.hidden = true;
 
   const login = makeButton(
     "champi-login",
     "Se connecter",
-    "btn"
+    true
   );
 
   const signup = makeButton(
     "champi-signup",
-    "Créer mon compte",
-    "btn secondary"
+    "Valider la création du compte",
+    true
   );
+  signup.hidden = true;
 
   const forgot = makeButton(
     "champi-forgot",
-    "Mot de passe oublié ?",
-    "btn secondary"
+    "Mot de passe oublié ?"
   );
 
-  const logout = makeButton(
-    "champi-logout",
-    "Se déconnecter",
-    "btn secondary"
+  const cancel = makeButton(
+    "champi-cancel",
+    "Fermer"
   );
 
-  logout.hidden = true;
+  form.append(
+    email,
+    password,
+    passwordConfirm,
+    login,
+    signup,
+    forgot,
+    cancel
+  );
 
-  const resetPassword = makeInput(
+  card.append(form);
+
+  const resetArea = node("div");
+  resetArea.id = "champi-reset-area";
+  resetArea.hidden = true;
+
+  const newPassword = makeInput(
     "champi-new-password",
     "password",
     "Nouveau mot de passe (8 caractères minimum)",
     "new-password"
   );
 
-  const resetConfirm = makeInput(
+  const newPasswordConfirm = makeInput(
     "champi-new-password-confirm",
     "password",
     "Confirmer le nouveau mot de passe",
@@ -134,39 +189,46 @@ function setupPanel() {
   const saveNewPassword = makeButton(
     "champi-save-new-password",
     "Enregistrer le nouveau mot de passe",
-    "btn"
+    true
   );
 
-  resetPassword.hidden = true;
-  resetConfirm.hidden = true;
-  saveNewPassword.hidden = true;
-
-  panel.append(
-    email,
-    password,
-    passwordConfirm,
-    login,
-    signup,
-    forgot,
-    logout
-  );
-
-  panel.append(
-    resetPassword,
-    resetConfirm,
+  resetArea.append(
+    newPassword,
+    newPasswordConfirm,
     saveNewPassword
   );
 
-  const status = node("p", "Vous n'êtes pas connecté.");
-  status.id = "champi-auth-status";
-  status.setAttribute("aria-live", "polite");
-  panel.append(status);
+  card.append(resetArea);
+
+  const accountArea = node("div");
+  accountArea.id = "champi-account-connected";
+  accountArea.hidden = true;
+
+  const logout = makeButton(
+    "champi-logout",
+    "Se déconnecter"
+  );
 
   const list = node("div");
   list.id = "champi-my-observations";
-  panel.append(list);
 
-  area.prepend(panel);
+  accountArea.append(logout, list);
+  card.append(accountArea);
+
+  const status = node(
+    "p",
+    "Vous n'êtes pas connecté."
+  );
+  status.id = "champi-auth-status";
+  status.setAttribute("aria-live", "polite");
+  status.style.cssText =
+    "margin:12px 0 0;color:#536456;font:14px/1.5 Arial,sans-serif";
+
+  card.append(status);
+  panel.append(card);
+
+  // Le compte apparaît juste sous le bandeau du site.
+  main.prepend(panel);
 }
 
 function describeObservation() {
@@ -189,7 +251,7 @@ function describeObservation() {
 
 async function loadMine(user) {
   const list = $("champi-my-observations");
-  list.replaceChildren(node("h4", "Mes observations"));
+  list.replaceChildren(node("h3", "Mes observations"));
 
   const { data, error } = await supabase
     .from("observations")
@@ -213,9 +275,8 @@ async function loadMine(user) {
 
   for (const item of data) {
     const card = node("article");
-
     card.style.cssText =
-      "background:white;border:1px solid #e7e4d9;border-radius:8px;padding:12px;margin:10px 0";
+      "background:#f6f3e9;border:1px solid #e4e2d7;border-radius:10px;padding:12px;margin:10px 0";
 
     card.append(
       node(
@@ -327,16 +388,32 @@ async function start() {
   const password = $("champi-password");
   const passwordConfirm = $("champi-password-confirm");
   const status = $("champi-auth-status");
+
+  const form = $("champi-auth-form");
+  const resetArea = $("champi-reset-area");
+  const accountArea = $("champi-account-connected");
+
+  const openLogin = $("champi-open-login");
+  const openSignup = $("champi-open-signup");
   const login = $("champi-login");
   const signup = $("champi-signup");
   const forgot = $("champi-forgot");
+  const cancel = $("champi-cancel");
   const logout = $("champi-logout");
+
   const newPassword = $("champi-new-password");
   const newPasswordConfirm = $("champi-new-password-confirm");
   const saveNewPassword = $("champi-save-new-password");
+
   const create = $("create-observation");
 
-  if (!email || !password || !passwordConfirm || !status || !create) {
+  if (
+    !email ||
+    !password ||
+    !passwordConfirm ||
+    !status ||
+    !create
+  ) {
     console.error(
       "Intégration Champi : éléments HTML attendus introuvables."
     );
@@ -350,21 +427,37 @@ async function start() {
 
   let user = null;
   let recoveryMode = false;
+  let accountMode = "";
+
+  function showForm(mode) {
+    accountMode = mode;
+    form.hidden = false;
+    resetArea.hidden = true;
+    accountArea.hidden = true;
+
+    passwordConfirm.hidden = mode !== "signup";
+    login.hidden = mode !== "login";
+    signup.hidden = mode !== "signup";
+    forgot.hidden = mode !== "login";
+
+    password.value = "";
+    passwordConfirm.value = "";
+
+    message(
+      status,
+      mode === "signup"
+        ? "Créez votre compte avec votre adresse e-mail et un mot de passe saisi deux fois."
+        : "Saisissez votre adresse e-mail et votre mot de passe."
+    );
+  }
 
   function showRecoveryMode(show) {
     recoveryMode = show;
-
-    email.hidden = show;
-    password.hidden = show;
-    passwordConfirm.hidden = true;
-    login.hidden = show;
-    signup.hidden = show;
-    forgot.hidden = show;
-    logout.hidden = true;
-
-    newPassword.hidden = !show;
-    newPasswordConfirm.hidden = !show;
-    saveNewPassword.hidden = !show;
+    form.hidden = true;
+    resetArea.hidden = !show;
+    accountArea.hidden = true;
+    openLogin.hidden = show;
+    openSignup.hidden = show;
 
     if (show) {
       message(
@@ -379,18 +472,13 @@ async function start() {
 
     if (recoveryMode) return;
 
-    login.hidden = !!user;
-    signup.hidden = !!user;
-    forgot.hidden = !!user;
-    logout.hidden = !user;
-
-    email.hidden = !!user;
-    password.hidden = !!user;
-
-    // Toujours cachée hors création de compte.
-    passwordConfirm.hidden = true;
-
     if (user) {
+      form.hidden = true;
+      resetArea.hidden = true;
+      accountArea.hidden = false;
+      openLogin.hidden = true;
+      openSignup.hidden = true;
+
       message(
         status,
         "Connecté : " + (user.email || "compte actif")
@@ -403,6 +491,12 @@ async function start() {
 
       await loadMine(user);
     } else {
+      form.hidden = true;
+      resetArea.hidden = true;
+      accountArea.hidden = true;
+      openLogin.hidden = false;
+      openSignup.hidden = false;
+
       message(status, "Vous n'êtes pas connecté.");
 
       message(
@@ -414,10 +508,32 @@ async function start() {
     }
   }
 
-  // CONNEXION : un seul mot de passe suffit.
-  login.addEventListener("click", async () => {
-    passwordConfirm.hidden = true;
+  openLogin.addEventListener("click", () => {
+    showForm("login");
+  });
 
+  openSignup.addEventListener("click", () => {
+    showForm("signup");
+  });
+
+  cancel.addEventListener("click", () => {
+    form.hidden = true;
+    passwordConfirm.hidden = true;
+    message(status, "Formulaire fermé.");
+  });
+
+  // Connexion : un seul mot de passe.
+  login.addEventListener("click", async () => {
+    if (!email.value.trim() || !password.value) {
+      message(
+        status,
+        "Saisissez votre adresse e-mail et votre mot de passe.",
+        true
+      );
+      return;
+    }
+
+    login.disabled = true;
     message(status, "Connexion en cours…");
 
     const { data, error } = await supabase.auth
@@ -425,6 +541,8 @@ async function start() {
         email: email.value.trim(),
         password: password.value
       });
+
+    login.disabled = false;
 
     if (error) {
       message(
@@ -439,37 +557,8 @@ async function start() {
     await render(data.session);
   });
 
-  // CRÉATION : première pression = afficher la confirmation.
-  // Deuxième pression = vérifier les deux mots de passe et créer.
+  // Création : les deux mots de passe doivent correspondre.
   signup.addEventListener("click", async () => {
-    if (passwordConfirm.hidden) {
-      if (!email.value.trim()) {
-        message(status, "Saisissez votre adresse e-mail.", true);
-        email.focus();
-        return;
-      }
-
-      if (password.value.length < 8) {
-        message(
-          status,
-          "Mot de passe : 8 caractères minimum.",
-          true
-        );
-        password.focus();
-        return;
-      }
-
-      passwordConfirm.hidden = false;
-
-      message(
-        status,
-        "Pour créer votre compte, saisissez une deuxième fois votre mot de passe."
-      );
-
-      passwordConfirm.focus();
-      return;
-    }
-
     if (!email.value.trim()) {
       message(status, "Saisissez votre adresse e-mail.", true);
       email.focus();
@@ -489,7 +578,7 @@ async function start() {
     if (password.value !== passwordConfirm.value) {
       message(
         status,
-        "Les deux mots de passe ne correspondent pas. Vérifiez votre saisie.",
+        "Les deux mots de passe ne correspondent pas.",
         true
       );
       passwordConfirm.focus();
@@ -522,6 +611,7 @@ async function start() {
     if (data.session) {
       await render(data.session);
     } else {
+      form.hidden = true;
       message(
         status,
         "Compte créé. Vérifiez votre e-mail pour confirmer l'inscription."
@@ -529,14 +619,12 @@ async function start() {
     }
   });
 
-  // MOT DE PASSE OUBLIÉ.
+  // Mot de passe oublié.
   forgot.addEventListener("click", async () => {
-    passwordConfirm.hidden = true;
-
     if (!email.value.trim()) {
       message(
         status,
-        "Saisissez d'abord votre adresse e-mail pour recevoir le lien de réinitialisation.",
+        "Saisissez d'abord votre adresse e-mail.",
         true
       );
       email.focus();
@@ -562,11 +650,11 @@ async function start() {
 
     message(
       status,
-      "Si cette adresse correspond à un compte, un e-mail de réinitialisation va être envoyé. Pensez à vérifier les courriers indésirables."
+      "Si cette adresse correspond à un compte, un e-mail de réinitialisation va être envoyé. Vérifiez aussi les courriers indésirables."
     );
   });
 
-  // ENREGISTREMENT DU NOUVEAU MOT DE PASSE.
+  // Enregistrement du nouveau mot de passe.
   saveNewPassword.addEventListener("click", async () => {
     if (newPassword.value.length < 8) {
       message(
@@ -618,11 +706,11 @@ async function start() {
 
     message(
       status,
-      "Votre mot de passe a été modifié. Vous pouvez maintenant vous connecter avec ce nouveau mot de passe."
+      "Votre mot de passe a été modifié."
     );
   });
 
-  // DÉCONNEXION.
+  // Déconnexion.
   logout.addEventListener("click", async () => {
     const { error } = await supabase.auth.signOut();
 
@@ -635,7 +723,7 @@ async function start() {
     await render(null);
   });
 
-  // ENREGISTREMENT D'UNE OBSERVATION.
+  // Enregistrement d'une observation.
   create.addEventListener("click", async () => {
     if (!user) {
       message(
