@@ -330,7 +330,7 @@ async function loadMine(user) {
 
   const { data, error } = await supabase
     .from("observations")
-    .select("id,observation_date,description,status,created_at")
+.select("id,observation_date,observed_at,description,status,visibility,approximate_location,latitude,longitude,created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(30);
@@ -420,12 +420,37 @@ async function saveObservation(user, status, button) {
     const { error } = await supabase
       .from("observations")
       .insert({
-        user_id: user.id,
-        observation_date: new Date().toISOString().slice(0, 10),
-        description: describeObservation(),
-        photo_path: photoPath,
-        status: "pending"
-      });
+  user_id: user.id,
+  observation_date: new Date(
+    $("obs-datetime").value || Date.now()
+  ).toISOString().slice(0, 10),
+
+  observed_at: new Date(
+    $("obs-datetime").value || Date.now()
+  ).toISOString(),
+
+  description: describeObservation(),
+
+  approximate_location: [
+    $("obs-town").value.trim(),
+    $("obs-postal").value.trim()
+  ].filter(Boolean).join(" "),
+
+  visibility: document.querySelector(
+    'input[name="obs-visibility"]:checked'
+  )?.value || "private",
+
+  latitude: $("obs-latitude").value
+    ? Math.round(Number($("obs-latitude").value) * 100) / 100
+    : null,
+
+  longitude: $("obs-longitude").value
+    ? Math.round(Number($("obs-longitude").value) * 100) / 100
+    : null,
+
+  photo_path: photoPath,
+  status: "pending"
+});
 
     if (error) {
       if (photoPath) {
