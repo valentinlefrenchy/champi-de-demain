@@ -39,7 +39,7 @@ function makeInput(id, type, placeholder, autocomplete) {
   input.placeholder = placeholder;
   input.autocomplete = autocomplete;
   input.style.cssText =
-    "display:block;width:100%;box-sizing:border-box;margin:9px 0;padding:13px 15px;border:1px solid #c6cbbb;border-radius:10px;background:#fffefa;color:#26352b;font:16px Arial,sans-serif";
+    "display:block;width:100%;box-sizing:border-box;margin:9px 0;padding:13px 14px;border:1px solid #c6cbbb;border-radius:9px;background:#fffefa;color:#26352b;font:16px Arial,sans-serif";
   return input;
 }
 
@@ -48,9 +48,26 @@ function makeButton(id, text, primary = false) {
   button.id = id;
   button.type = "button";
   button.style.cssText = primary
-    ? "display:block;width:100%;padding:13px 16px;margin:9px 0;border:1px solid #183d2c;border-radius:10px;background:#183d2c;color:white;font:bold 16px Arial,sans-serif;cursor:pointer"
-    : "display:block;width:100%;padding:12px 16px;margin:9px 0;border:1px solid #183d2c;border-radius:10px;background:#fffefa;color:#183d2c;font:bold 15px Arial,sans-serif;cursor:pointer";
+    ? "display:block;width:100%;padding:13px 14px;margin:10px 0 0;border:1px solid #183d2c;border-radius:9px;background:#183d2c;color:white;font:bold 16px Arial,sans-serif;cursor:pointer"
+    : "display:block;width:100%;padding:12px 14px;margin:9px 0 0;border:1px solid #183d2c;border-radius:9px;background:#fffefa;color:#183d2c;font:bold 15px Arial,sans-serif;cursor:pointer";
   return button;
+}
+
+function makeCard(title, description) {
+  const card = node("div");
+  card.style.cssText =
+    "min-width:0;padding:18px;background:#fffefa;border:1px solid #dedfd2;border-radius:14px;box-shadow:0 4px 14px rgba(24,61,44,.06)";
+
+  const heading = node("h3", title);
+  heading.style.cssText =
+    "margin:0 0 7px;color:#183d2c;font-size:21px";
+
+  const intro = node("p", description);
+  intro.style.cssText =
+    "margin:0 0 14px;color:#667267;font:14px/1.5 Arial,sans-serif";
+
+  card.append(heading, intro);
+  return card;
 }
 
 function setupPanel() {
@@ -60,117 +77,144 @@ function setupPanel() {
   const panel = node("section");
   panel.id = "champi-account";
   panel.style.cssText =
-    "padding:22px 6%;background:#f6f3e9;border-bottom:1px solid #e2dfd2";
+    "display:block;padding:24px 5%;background:#f6f3e9;border-bottom:1px solid #e2dfd2";
 
-  const card = node("div");
-  card.style.cssText =
-    "max-width:850px;margin:0 auto;padding:20px 22px;background:#fffefa;border:1px solid #e4e2d7;border-radius:16px;box-shadow:0 5px 20px rgba(24,61,44,.07)";
-
-  const heading = node("div");
-  heading.style.cssText =
-    "display:flex;align-items:center;gap:10px;margin-bottom:5px";
-
-  const icon = node("span", "🍄");
-  icon.style.fontSize = "25px";
+  const container = node("div");
+  container.style.cssText =
+    "max-width:1050px;margin:0 auto";
 
   const title = node("h2", "Mon espace personnel");
   title.style.cssText =
-    "margin:0;color:#183d2c;font-size:23px";
-
-  heading.append(icon, title);
-  card.append(heading);
+    "margin:0 0 8px;color:#183d2c;font-size:26px;text-align:center";
 
   const intro = node(
     "p",
-    "Connectez-vous pour retrouver votre carnet et enregistrer vos observations."
+    "Retrouvez votre carnet ou créez votre espace Champi de Demain."
   );
   intro.style.cssText =
-    "margin:7px 0 16px;color:#667267;font:15px/1.5 Arial,sans-serif";
-  card.append(intro);
+    "margin:0 auto 20px;max-width:650px;text-align:center;color:#667267;font:15px/1.5 Arial,sans-serif";
 
-  const choices = node("div");
-  choices.style.cssText =
-    "display:grid;grid-template-columns:1fr 1fr;gap:10px";
+  const cards = node("div");
+  cards.style.cssText =
+    "display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start";
 
-  const openLogin = makeButton(
-    "champi-open-login",
+  const loginCard = makeCard(
     "Se connecter",
-    true
+    "Vous avez déjà un compte ? Retrouvez votre espace personnel."
   );
 
-  const openSignup = makeButton(
-    "champi-open-signup",
-    "Créer un compte"
+  const signupCard = makeCard(
+    "Créer un compte",
+    "Rejoignez Champi de Demain et conservez vos observations."
   );
 
-  choices.append(openLogin, openSignup);
-  card.append(choices);
-
-  const form = node("div");
-  form.id = "champi-auth-form";
-  form.hidden = true;
-  form.style.marginTop = "14px";
-
-  const email = makeInput(
-    "champi-email",
+  // Carte de connexion : ses propres champs.
+  const loginEmail = makeInput(
+    "champi-login-email",
     "email",
-    "Adresse e-mail",
-    "email"
+    "Votre adresse e-mail",
+    "username"
   );
 
-  const password = makeInput(
-    "champi-password",
+  const loginPassword = makeInput(
+    "champi-login-password",
     "password",
-    "Mot de passe",
+    "Votre mot de passe",
     "current-password"
   );
 
-  const passwordConfirm = makeInput(
-    "champi-password-confirm",
-    "password",
-    "Confirmer le mot de passe",
-    "new-password"
-  );
-  passwordConfirm.hidden = true;
-
-  const login = makeButton(
-    "champi-login",
+  const loginButton = makeButton(
+    "champi-login-button",
     "Se connecter",
     true
   );
 
-  const signup = makeButton(
-    "champi-signup",
-    "Valider la création du compte",
-    true
-  );
-  signup.hidden = true;
-
-  const forgot = makeButton(
-    "champi-forgot",
+  const forgotButton = makeButton(
+    "champi-forgot-button",
     "Mot de passe oublié ?"
   );
 
-  const cancel = makeButton(
-    "champi-cancel",
-    "Fermer"
+  loginCard.append(
+    loginEmail,
+    loginPassword,
+    loginButton,
+    forgotButton
   );
 
-  form.append(
-    email,
-    password,
-    passwordConfirm,
-    login,
-    signup,
-    forgot,
-    cancel
+  // Carte de création : champs indépendants.
+  const signupEmail = makeInput(
+    "champi-signup-email",
+    "email",
+    "Votre adresse e-mail",
+    "email"
   );
 
-  card.append(form);
+  const signupPassword = makeInput(
+    "champi-signup-password",
+    "password",
+    "Choisissez un mot de passe (8 caractères minimum)",
+    "new-password"
+  );
 
+  const signupConfirm = makeInput(
+    "champi-signup-confirm",
+    "password",
+    "Confirmez votre mot de passe",
+    "new-password"
+  );
+
+  const signupButton = makeButton(
+    "champi-signup-button",
+    "Créer mon compte",
+    true
+  );
+
+  signupCard.append(
+    signupEmail,
+    signupPassword,
+    signupConfirm,
+    signupButton
+  );
+
+  cards.append(loginCard, signupCard);
+
+  // Affichage mobile : les deux cartes l'une sous l'autre.
+  const style = node("style");
+  style.textContent = `
+    @media(max-width:650px) {
+      #champi-account .champi-auth-cards {
+        grid-template-columns:1fr !important;
+      }
+    }
+    #champi-account button:disabled {
+      opacity:.55;
+      cursor:wait;
+    }
+    #champi-account input:focus {
+      outline:2px solid #d6ae69;
+      outline-offset:1px;
+    }
+  `;
+  cards.className = "champi-auth-cards";
+
+  const status = node(
+    "p",
+    "Vous n'êtes pas connecté."
+  );
+  status.id = "champi-auth-status";
+  status.setAttribute("aria-live", "polite");
+  status.style.cssText =
+    "margin:16px 0 0;padding:10px 12px;border-radius:8px;background:#f3f1e8;color:#536456;font:14px/1.5 Arial,sans-serif";
+
+  // Formulaire de récupération du mot de passe.
   const resetArea = node("div");
   resetArea.id = "champi-reset-area";
   resetArea.hidden = true;
+  resetArea.style.cssText =
+    "max-width:520px;margin:18px auto 0;padding:18px;background:#fffefa;border:1px solid #dedfd2;border-radius:12px";
+
+  const resetTitle = node("h3", "Choisir un nouveau mot de passe");
+  resetTitle.style.color = "#183d2c";
 
   const newPassword = makeInput(
     "champi-new-password",
@@ -193,16 +237,21 @@ function setupPanel() {
   );
 
   resetArea.append(
+    resetTitle,
     newPassword,
     newPasswordConfirm,
     saveNewPassword
   );
 
-  card.append(resetArea);
+  // Espace visible après connexion.
+  const connectedArea = node("div");
+  connectedArea.id = "champi-connected-area";
+  connectedArea.hidden = true;
+  connectedArea.style.cssText =
+    "margin-top:18px;padding:18px;background:#fffefa;border:1px solid #dedfd2;border-radius:12px";
 
-  const accountArea = node("div");
-  accountArea.id = "champi-account-connected";
-  accountArea.hidden = true;
+  const connectedTitle = node("h3", "Votre espace");
+  connectedTitle.style.color = "#183d2c";
 
   const logout = makeButton(
     "champi-logout",
@@ -212,22 +261,20 @@ function setupPanel() {
   const list = node("div");
   list.id = "champi-my-observations";
 
-  accountArea.append(logout, list);
-  card.append(accountArea);
+  connectedArea.append(connectedTitle, logout, list);
 
-  const status = node(
-    "p",
-    "Vous n'êtes pas connecté."
+  container.append(
+    title,
+    intro,
+    cards,
+    resetArea,
+    connectedArea,
+    status
   );
-  status.id = "champi-auth-status";
-  status.setAttribute("aria-live", "polite");
-  status.style.cssText =
-    "margin:12px 0 0;color:#536456;font:14px/1.5 Arial,sans-serif";
 
-  card.append(status);
-  panel.append(card);
+  panel.append(container);
 
-  // Le compte apparaît juste sous le bandeau du site.
+  // Position réelle : juste après le bandeau, avant le visuel d'accueil.
   main.prepend(panel);
 }
 
@@ -384,22 +431,20 @@ async function saveObservation(user, status, button) {
 async function start() {
   setupPanel();
 
-  const email = $("champi-email");
-  const password = $("champi-password");
-  const passwordConfirm = $("champi-password-confirm");
-  const status = $("champi-auth-status");
+  const loginEmail = $("champi-login-email");
+  const loginPassword = $("champi-login-password");
+  const signupEmail = $("champi-signup-email");
+  const signupPassword = $("champi-signup-password");
+  const signupConfirm = $("champi-signup-confirm");
 
-  const form = $("champi-auth-form");
-  const resetArea = $("champi-reset-area");
-  const accountArea = $("champi-account-connected");
-
-  const openLogin = $("champi-open-login");
-  const openSignup = $("champi-open-signup");
-  const login = $("champi-login");
-  const signup = $("champi-signup");
-  const forgot = $("champi-forgot");
-  const cancel = $("champi-cancel");
+  const loginButton = $("champi-login-button");
+  const signupButton = $("champi-signup-button");
+  const forgotButton = $("champi-forgot-button");
   const logout = $("champi-logout");
+
+  const status = $("champi-auth-status");
+  const resetArea = $("champi-reset-area");
+  const connectedArea = $("champi-connected-area");
 
   const newPassword = $("champi-new-password");
   const newPasswordConfirm = $("champi-new-password-confirm");
@@ -408,9 +453,11 @@ async function start() {
   const create = $("create-observation");
 
   if (
-    !email ||
-    !password ||
-    !passwordConfirm ||
+    !loginEmail ||
+    !loginPassword ||
+    !signupEmail ||
+    !signupPassword ||
+    !signupConfirm ||
     !status ||
     !create
   ) {
@@ -427,37 +474,18 @@ async function start() {
 
   let user = null;
   let recoveryMode = false;
-  let accountMode = "";
-
-  function showForm(mode) {
-    accountMode = mode;
-    form.hidden = false;
-    resetArea.hidden = true;
-    accountArea.hidden = true;
-
-    passwordConfirm.hidden = mode !== "signup";
-    login.hidden = mode !== "login";
-    signup.hidden = mode !== "signup";
-    forgot.hidden = mode !== "login";
-
-    password.value = "";
-    passwordConfirm.value = "";
-
-    message(
-      status,
-      mode === "signup"
-        ? "Créez votre compte avec votre adresse e-mail et un mot de passe saisi deux fois."
-        : "Saisissez votre adresse e-mail et votre mot de passe."
-    );
-  }
 
   function showRecoveryMode(show) {
     recoveryMode = show;
-    form.hidden = true;
     resetArea.hidden = !show;
-    accountArea.hidden = true;
-    openLogin.hidden = show;
-    openSignup.hidden = show;
+
+    document.querySelectorAll(
+      "#champi-account .champi-auth-cards"
+    ).forEach(element => {
+      element.hidden = show;
+    });
+
+    connectedArea.hidden = true;
 
     if (show) {
       message(
@@ -472,13 +500,17 @@ async function start() {
 
     if (recoveryMode) return;
 
-    if (user) {
-      form.hidden = true;
-      resetArea.hidden = true;
-      accountArea.hidden = false;
-      openLogin.hidden = true;
-      openSignup.hidden = true;
+    connectedArea.hidden = !user;
 
+    document.querySelectorAll(
+      "#champi-account .champi-auth-cards"
+    ).forEach(element => {
+      element.hidden = !!user;
+    });
+
+    resetArea.hidden = true;
+
+    if (user) {
       message(
         status,
         "Connecté : " + (user.email || "compte actif")
@@ -491,12 +523,6 @@ async function start() {
 
       await loadMine(user);
     } else {
-      form.hidden = true;
-      resetArea.hidden = true;
-      accountArea.hidden = true;
-      openLogin.hidden = false;
-      openSignup.hidden = false;
-
       message(status, "Vous n'êtes pas connecté.");
 
       message(
@@ -508,23 +534,9 @@ async function start() {
     }
   }
 
-  openLogin.addEventListener("click", () => {
-    showForm("login");
-  });
-
-  openSignup.addEventListener("click", () => {
-    showForm("signup");
-  });
-
-  cancel.addEventListener("click", () => {
-    form.hidden = true;
-    passwordConfirm.hidden = true;
-    message(status, "Formulaire fermé.");
-  });
-
-  // Connexion : un seul mot de passe.
-  login.addEventListener("click", async () => {
-    if (!email.value.trim() || !password.value) {
+  // CONNEXION : e-mail et un seul mot de passe.
+  loginButton.addEventListener("click", async () => {
+    if (!loginEmail.value.trim() || !loginPassword.value) {
       message(
         status,
         "Saisissez votre adresse e-mail et votre mot de passe.",
@@ -533,16 +545,16 @@ async function start() {
       return;
     }
 
-    login.disabled = true;
+    loginButton.disabled = true;
     message(status, "Connexion en cours…");
 
     const { data, error } = await supabase.auth
       .signInWithPassword({
-        email: email.value.trim(),
-        password: password.value
+        email: loginEmail.value.trim(),
+        password: loginPassword.value
       });
 
-    login.disabled = false;
+    loginButton.disabled = false;
 
     if (error) {
       message(
@@ -557,46 +569,46 @@ async function start() {
     await render(data.session);
   });
 
-  // Création : les deux mots de passe doivent correspondre.
-  signup.addEventListener("click", async () => {
-    if (!email.value.trim()) {
+  // CRÉATION : e-mail, mot de passe et confirmation.
+  signupButton.addEventListener("click", async () => {
+    if (!signupEmail.value.trim()) {
       message(status, "Saisissez votre adresse e-mail.", true);
-      email.focus();
+      signupEmail.focus();
       return;
     }
 
-    if (password.value.length < 8) {
+    if (signupPassword.value.length < 8) {
       message(
         status,
-        "Mot de passe : 8 caractères minimum.",
+        "Le mot de passe doit contenir au moins 8 caractères.",
         true
       );
-      password.focus();
+      signupPassword.focus();
       return;
     }
 
-    if (password.value !== passwordConfirm.value) {
+    if (signupPassword.value !== signupConfirm.value) {
       message(
         status,
         "Les deux mots de passe ne correspondent pas.",
         true
       );
-      passwordConfirm.focus();
+      signupConfirm.focus();
       return;
     }
 
-    signup.disabled = true;
-    message(status, "Création du compte…");
+    signupButton.disabled = true;
+    message(status, "Création du compte en cours…");
 
     const { data, error } = await supabase.auth.signUp({
-      email: email.value.trim(),
-      password: password.value,
+      email: signupEmail.value.trim(),
+      password: signupPassword.value,
       options: {
         emailRedirectTo: SITE_URL
       }
     });
 
-    signup.disabled = false;
+    signupButton.disabled = false;
 
     if (error) {
       message(
@@ -608,10 +620,12 @@ async function start() {
       return;
     }
 
+    signupPassword.value = "";
+    signupConfirm.value = "";
+
     if (data.session) {
       await render(data.session);
     } else {
-      form.hidden = true;
       message(
         status,
         "Compte créé. Vérifiez votre e-mail pour confirmer l'inscription."
@@ -619,22 +633,22 @@ async function start() {
     }
   });
 
-  // Mot de passe oublié.
-  forgot.addEventListener("click", async () => {
-    if (!email.value.trim()) {
+  // MOT DE PASSE OUBLIÉ : utilise l'adresse de la carte connexion.
+  forgotButton.addEventListener("click", async () => {
+    if (!loginEmail.value.trim()) {
       message(
         status,
-        "Saisissez d'abord votre adresse e-mail.",
+        "Saisissez votre adresse e-mail dans la carte de connexion.",
         true
       );
-      email.focus();
+      loginEmail.focus();
       return;
     }
 
     message(status, "Envoi du lien de réinitialisation…");
 
     const { error } = await supabase.auth
-      .resetPasswordForEmail(email.value.trim(), {
+      .resetPasswordForEmail(loginEmail.value.trim(), {
         redirectTo: SITE_URL
       });
 
@@ -654,12 +668,12 @@ async function start() {
     );
   });
 
-  // Enregistrement du nouveau mot de passe.
+  // ENREGISTREMENT DU NOUVEAU MOT DE PASSE.
   saveNewPassword.addEventListener("click", async () => {
     if (newPassword.value.length < 8) {
       message(
         status,
-        "Nouveau mot de passe : 8 caractères minimum.",
+        "Le nouveau mot de passe doit contenir au moins 8 caractères.",
         true
       );
       newPassword.focus();
@@ -710,7 +724,7 @@ async function start() {
     );
   });
 
-  // Déconnexion.
+  // DÉCONNEXION.
   logout.addEventListener("click", async () => {
     const { error } = await supabase.auth.signOut();
 
@@ -723,7 +737,7 @@ async function start() {
     await render(null);
   });
 
-  // Enregistrement d'une observation.
+  // ENREGISTREMENT D'UNE OBSERVATION.
   create.addEventListener("click", async () => {
     if (!user) {
       message(
