@@ -1,932 +1,313 @@
-<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#183d2c">
-<meta name="description" content="Champi de Demain : encyclopédie pédagogique des champignons, saisons et territoires.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Champi de Demain — Explorer la nature">
-<meta property="og:description" content="Encyclopédie pédagogique des champignons, saisons et territoires.">
-<meta property="og:image" content="https://images.unsplash.com/photo-1504545102780-26774c1bb073?w=1200">
-<meta property="og:locale" content="fr_FR">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍄%3C/text%3E%3C/svg%3E">
-<title>Champi de Demain — Explorer la nature</title>
-<link rel="stylesheet"
- href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-:root{--forest:#183d2c;--cream:#f6f3e9;--gold:#d6ae69;--ink:#26352b;--muted:#667267;--paper:#fffefa}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--cream);color:var(--ink);font-family:Georgia,serif}
-header{background:var(--forest);color:white;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-.logo{font-size:23px;font-weight:bold}.logo span{color:var(--gold)}
-nav{display:flex;gap:16px;flex-wrap:wrap}
-nav a{color:white;text-decoration:none}
-.hero{color:white;padding:clamp(65px,10vw,110px) 8%;min-height:390px;background:linear-gradient(90deg,rgba(15,40,27,.94),rgba(15,40,27,.45)),url("https://images.unsplash.com/photo-1504545102780-26774c1bb073?w=1600") center/cover}
-.hero h1{font-size:clamp(36px,6vw,62px);max-width:760px}
-.hero p{font-size:19px;line-height:1.65;max-width:650px}
-.btn{display:inline-block;background:var(--gold);color:#17291d;padding:13px 20px;border:0;border-radius:6px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:16px}
-section{padding:52px 8%}
-h2{color:var(--forest);font-size:clamp(27px,4vw,34px)}
-.intro{max-width:760px;line-height:1.7;color:#48564b}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr));gap:18px;margin-top:24px}
-.card{background:var(--paper);border:1px solid #e7e4d9;border-radius:12px;overflow:hidden;box-shadow:0 5px 18px #17291d0a}
-.card-content{padding:19px}
-.card h3{color:var(--forest);margin:0 0 8px;font-size:21px}
-.scientific{font-style:italic;color:var(--muted)}
-.tag{display:inline-block;background:#edf1e8;color:var(--forest);border-radius:20px;padding:5px 9px;font:12px Arial,sans-serif;margin:3px 4px 3px 0}
-.tag.warn{background:#fff0d9;color:#7b4512}
-.tag.danger{background:#f8e5e2;color:#8b211b}
-.search-area{background:#e9e8dc;border-radius:12px;padding:22px;max-width:680px;margin-top:22px}
-input{width:100%;padding:14px;border:1px solid #a9afa4;border-radius:6px;margin:10px 0 14px;font-size:17px;background:white}
-.data-status{line-height:1.6;margin:16px 0;color:#465449}
-.error{color:#9b2828}
-.warning{background:#fff0d9;border-left:5px solid #c28a35;padding:19px;line-height:1.65;border-radius:5px}
-footer{background:var(--forest);color:white;padding:32px 8%;line-height:1.8}
-footer a{color:var(--gold)}
-
-/* Accessibilité : focus clavier visible */
-a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
-  outline:3px solid #b8741a;outline-offset:2px}
-nav a:focus-visible,footer a:focus-visible,.hero .btn:focus-visible{outline-color:var(--gold)}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-
-@media(max-width:600px){header{padding:17px 5%}nav{gap:12px}.hero{padding:65px 6%}section{padding:39px 6%}}
-
-
-/* CARNET D'OBSERVATION — DESIGN MOBILE PREMIUM */
-#observation {
-  padding: 70px 7%;
-}
-
-#observation h2 {
-  font-size: clamp(34px, 5vw, 46px);
-  margin-bottom: 18px;
-}
-
-#observation > .intro {
-  max-width: 900px;
-  font-size: 19px;
-  line-height: 1.8;
-  margin-bottom: 30px;
-}
-
-#observation .search-area {
-  max-width: 850px;
-  padding: clamp(24px, 5vw, 42px);
-  margin: 30px auto;
-  background: #fffefa;
-  border: 1px solid #e3dfd1;
-  border-radius: 20px;
-  box-shadow: 0 12px 35px #17291d12;
-}
-
-#observation .search-area label {
-  display: block;
-  font-size: 18px;
-  line-height: 1.5;
-  margin: 28px 0 10px;
-  color: var(--forest);
-}
-
-#observation .search-area select,
-#observation .search-area textarea {
-  display: block;
-  width: 100%;
-  min-height: 58px;
-  padding: 16px;
-  margin-bottom: 20px;
-  border: 1px solid #c9cec2;
-  border-radius: 12px;
-  background: white;
-  color: #26352b;
-  font: 17px Arial, sans-serif;
-  transition: border-color .2s, box-shadow .2s;
-}
-
-#observation .search-area select:focus,
-#observation .search-area textarea:focus,
-#observation .search-area input:focus {
-  border-color: var(--forest);
-  box-shadow: 0 0 0 3px #183d2c18;
-  outline: none;
-}
-
-#observation .search-area textarea {
-  min-height: 130px;
-  line-height: 1.7;
-  resize: vertical;
-}
-
-#obs-photo {
-  display: block;
-  width: 100%;
-  padding: 18px;
-  margin: 12px 0;
-  background: #f0f2e9;
-  border: 2px dashed #9da995;
-  border-radius: 14px;
-  font-size: 15px;
-}
-
-#obs-photo-preview {
-  display: block;
-  width: 100%;
-  max-width: 500px;
-  max-height: 380px;
-  object-fit: contain;
-  background: #f0f2e9;
-  border-radius: 14px;
-  margin: 18px auto;
-}
-
-#observation .btn {
-  display: block;
-  width: 100%;
-  min-height: 64px;
-  margin-top: 28px;
-  padding: 16px;
-  border-radius: 12px;
-  background: var(--forest);
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  box-shadow: 0 5px 14px #183d2c24;
-}
-
-#observation .btn:active {
-  transform: scale(.99);
-}
-
-#observation-result {
-  background: #f3f3e9;
-  border: 1px solid #e0e2d6;
-  border-radius: 14px;
-  padding: 24px;
-  margin-top: 28px;
-  font-size: 17px;
-  line-height: 1.8;
-}
-
-#observation-result:empty {
-  display: none;
-}
-
-#observation-result li {
-  margin-bottom: 12px;
-}
-
-.observation-gallery {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  margin: 35px 0;
-}
-
-.observation-photo {
-  margin: 0;
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 5px 18px #17291d12;
-}
-
-.observation-photo img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-}
-
-.observation-photo figcaption {
-  padding: 20px;
-  font-size: 16px;
-  line-height: 1.7;
-}
-
-.observation-photo strong {
-  display: block;
-  font-size: 20px;
-  color: var(--forest);
-  margin-bottom: 8px;
-}
-
-.observation-photo a {
-  color: #536b58;
-}
-
-.note {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.6;
-  margin: 8px 0 0;
-}
-
-@media(max-width:600px) {
-  #observation {
-    padding: 45px 5%;
-  }
-
-  #observation .search-area {
-    padding: 22px 17px;
-    border-radius: 16px;
-  }
-
-  .observation-gallery {
-    grid-template-columns: 1fr;
-  }
-
-  #observation .search-area label {
-    font-size: 17px;
-    margin-top: 24px;
-  }
-
-  #observation-result {
-    padding: 18px;
-    font-size: 16px;
-  }
-}
-
-@media print {
-  header, nav, .hero, section:not(#observation), footer,
-  .observation-gallery, #observation > .intro,
-  #observation .search-area > *:not(#observation-result) {
-    display: none !important;
-  }
-
-  #observation .search-area {
-    background: none;
-    padding: 0;
-    box-shadow: none;
-  }
-}
-
-@media print{
-  header,nav,.hero,section:not(#observation),footer,.observation-gallery,#observation > .intro,#observation .search-area > *:not(#observation-result){display:none!important}
-  #observation .search-area{background:none;padding:0}
-}
-</style>
-</head>
-
-<body>
-<header>
-<div class="logo">🍄 Champi <span>de Demain</span></div>
-<nav aria-label="Navigation">
-<a href="#explorer">Champignons</a>
-<a href="#territoire">Territoires</a>
-<a href="#saisons">Saisons</a>
-<a href="#ecole">Apprendre</a>
-<a href="#observation">Mon carnet</a>
-<a href="#securite">Sécurité</a>
-</nav>
-</header>
-
-<main>
-<section class="hero">
-<h1>La nature a encore beaucoup à nous apprendre.</h1>
-<p>Explorez les champignons, découvrez leurs habitats, les saisons et les secrets des forêts françaises.</p>
-<a href="#explorer" class="btn">Partir à la découverte</a>
-</section>
-
-<section id="explorer">
-<h2>Notre encyclopédie</h2>
-<p class="intro">Découvrez les premières fiches de notre bibliothèque. Les informations sont pédagogiques et ne valident jamais la comestibilité.</p>
-<p id="species-status" class="data-status" aria-live="polite">Chargement des fiches…</p>
-<div id="species-grid" class="grid"></div>
-</section>
-
-<section id="territoire" style="background:#e9e8dc">
-<h2>Explorer son territoire</h2>
-<p class="intro">Recherchez une commune enregistrée à partir de son code postal.</p>
-<div class="search-area">
-<label for="postal"><strong>Votre code postal</strong></label>
-<input id="postal" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="Exemple : 82100">
-<label for="radius"><strong>Rayon de recherche</strong></label>
-<select id="radius" style="width:100%;padding:14px;border-radius:6px;font-size:17px;margin:10px 0 14px">
-<option value="5">5 km</option>
-<option value="10">10 km</option>
-<option value="20" selected>20 km</option>
-<option value="30">30 km</option>
-<option value="50">50 km</option>
-</select>
-<button class="btn" id="search-region" type="button">Explorer mon secteur</button>
-<p id="region-status" class="data-status" aria-live="polite"></p>
-</div>
-<div id="regions-grid" class="grid"></div>
-</section>
-
-<section id="saisons">
-<h2>Le calendrier des saisons</h2>
-<p class="intro">Périodes indicatives : la pousse dépend des pluies, des températures, des sols et des milieux. Elles ne prédisent pas une présence locale.</p>
-<p id="season-status" class="data-status" aria-live="polite">Chargement du calendrier…</p>
-<div id="seasons-grid" class="grid"></div>
-</section>
-
-<section id="ecole">
-<h2>L’école du cueilleur</h2>
-<p class="intro">Apprenez à observer sans vous précipiter : chaque détail compte et une photo ne suffit jamais à garantir une identification.</p>
-<div class="grid">
-<article class="card"><div class="card-content"><h3>01 — Observer</h3><p>Forme, couleur, chapeau, pied, lamelles ou pores, anneau, volve et sporée.</p></div></article>
-<article class="card"><div class="card-content"><h3>02 — Comprendre</h3><p>Les sols, les arbres associés, les habitats et les conditions climatiques.</p></div></article>
-<article class="card"><div class="card-content"><h3>03 — Préserver</h3><p>Respecter les milieux naturels, les propriétés et les réglementations locales.</p></div></article>
-</div>
-</section>
-
-<section id="observation">
-<h2>Mon carnet d’observation</h2>
-<p class="intro">Prenez le temps de décrire votre découverte. Chaque détail peut aider un spécialiste à étudier le champignon.</p>
-
-<div class="observation-gallery">
-  <figure class="observation-photo">
-    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Mushroom%20underside%20%28Gills%29%20%2829097123352%29.jpg"
-      alt="Photographie rapprochée des lamelles serrées sous le chapeau d’un champignon" loading="lazy">
-    <figcaption>
-      <strong>Les lamelles</strong>
-      Observez leur couleur, leur espacement et leur attache au pied.
-      <a href="https://commons.wikimedia.org/wiki/File:Mushroom_underside_(Gills)_(29097123352).jpg" target="_blank" rel="noopener">Photo : Jonathan Cutrer — CC BY 2.0</a>.
-    </figcaption>
-  </figure>
-  <figure class="observation-photo">
-    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Mushroom%20close-up.jpg"
-      alt="Vue rapprochée du dessous d’un champignon, montrant la texture sous le chapeau" loading="lazy">
-    <figcaption>
-      <strong>Le dessous du chapeau</strong>
-      Regardez attentivement les structures sous le chapeau et leur disposition.
-      <a href="https://commons.wikimedia.org/wiki/File:Mushroom_close-up.jpg" target="_blank" rel="noopener">Photo : Dave Croker — CC BY-SA 3.0</a>.
-    </figcaption>
-  </figure>
-</div>
-
-<p class="intro">Ces photographies sont des supports pédagogiques. Elles ne permettent jamais de confirmer une identification ou la comestibilité.</p>
-
-<div class="search-area">
-<label for="obs-photo"><strong>Ajouter une photo de votre champignon</strong></label>
-<input id="obs-photo" type="file" accept="image/*">
-<p class="note">L’aperçu reste sur votre appareil. Si vous êtes connecté et que vous enregistrez votre fiche, la photo sera envoyée de façon sécurisée dans votre espace privé, en attente de modération.</p>
-<img id="obs-photo-preview" alt="Aperçu de votre photo" hidden style="width:100%;max-width:500px;border-radius:12px;margin:15px 0;">
-
-<label for="obs-datetime"><strong>Date et heure de la découverte</strong></label>
-<input id="obs-datetime" type="datetime-local">
-
-<label for="obs-postal"><strong>Code postal</strong></label>
-<input id="obs-postal" inputmode="numeric" maxlength="5" placeholder="Exemple : 82100">
-
-<label for="obs-town"><strong>Commune ou secteur</strong></label>
-<input id="obs-town" type="text" maxlength="100" placeholder="Nom de la commune">
-
-<strong>Visibilité de la découverte</strong>
-<label><input type="radio" name="obs-visibility" value="private" checked> 🔒 Privée — moi uniquement</label>
-<label><input type="radio" name="obs-visibility" value="public"> 🌍 Publique — après modération</label>
-
-<p class="note">La position publique sera approximative pour protéger les lieux de découverte.</p>
-
-<button type="button" class="btn" id="obs-geolocate">Utiliser ma position GPS</button>
-<div id="obs-location-map" style="height:300px;border-radius:14px;margin:15px 0"></div>
-<input type="hidden" id="obs-latitude">
-<input type="hidden" id="obs-longitude">
-<p id="obs-location-status" class="note">Aucun emplacement sélectionné.</p>
-<label for="obs-habitat"><strong>1. Où l'avez-vous trouvé ?</strong></label>
-<select id="obs-habitat">
-<option value="">Choisir un milieu</option>
-<option>Forêt de feuillus</option>
-<option>Forêt de conifères</option>
-<option>Forêt mixte</option>
-<option>Prairie ou pâturage</option>
-<option>Jardin ou parc</option>
-<option>Autre milieu</option>
-</select>
-
-<label for="obs-under"><strong>2. Que voyez-vous sous le chapeau ?</strong></label>
-<select id="obs-under">
-<option value="">Choisir une observation</option>
-<option>Des lamelles</option>
-<option>Des petits tubes ou pores</option>
-<option>Des aiguillons ou dents</option>
-<option>Surface lisse</option>
-<option>Je ne sais pas</option>
-</select>
-
-<label for="obs-cap"><strong>3. Quelle est la forme du chapeau ?</strong></label>
-<select id="obs-cap">
-<option value="">Choisir une forme</option>
-<option>Arrondi ou bombé</option>
-<option>Plat ou étalé</option>
-<option>En entonnoir</option>
-<option>En cloche</option>
-<option>Irrégulier</option>
-<option>Je ne sais pas</option>
-</select>
-
-<label for="obs-stem"><strong>4. Décrivez le pied</strong></label>
-<select id="obs-stem">
-<option value="">Choisir une observation</option>
-<option>Fin et élancé</option>
-<option>Épais et robuste</option>
-<option>Creux</option>
-<option>Bulbeux à la base</option>
-<option>Sans pied apparent</option>
-<option>Je ne sais pas</option>
-</select>
-
-<label for="obs-ring"><strong>5. Voyez-vous un anneau ou une volve ?</strong></label>
-<select id="obs-ring">
-<option value="">Choisir une réponse</option>
-<option>Anneau visible</option>
-<option>Volve visible à la base</option>
-<option>Les deux</option>
-<option>Aucun observé</option>
-<option>Je ne sais pas</option>
-</select>
-
-<label for="obs-color"><strong>6. Couleur et autres détails</strong></label>
-<textarea id="obs-color" rows="3" placeholder="Couleur du chapeau, odeur, taille, arbres proches, détails particuliers…"></textarea>
-
-<button class="btn" id="create-observation" type="button">Créer ma fiche d’observation</button>
-<div id="observation-result" class="data-status" aria-live="polite"></div>
-</div><section id="community-discoveries">
-  <h2>Carte des découvertes</h2>
-  <p class="intro">
-    Explorez les découvertes partagées par la communauté
-    ou retrouvez vos propres observations.
-  </p>
-
-  <button class="btn" id="show-public-map" type="button">
-    🌍 Carte communautaire
-  </button>
-
-  <button class="btn" id="show-personal-map" type="button">
-    🔒 Ma carte personnelle
-  </button>
-
-  <p id="community-map-status" class="note" aria-live="polite">
-    Choisissez une carte.
-  </p>
-
-  <div id="community-map"
-       style="height:420px;border-radius:16px;overflow:hidden">
-  </div>
-</section>
-</section>
-
-<section id="securite">
-<h2>La sécurité avant tout</h2>
-<div class="warning"><strong>Attention :</strong> ce site est pédagogique. Il ne permet pas de déterminer si un champignon est comestible. Ne consommez jamais un champignon sur la base d’une photographie ou d’une identification automatique. En cas de doute, demandez l’avis d’un pharmacien ou d’un mycologue. En cas d’ingestion suspectée, contactez immédiatement un centre antipoison ou le 15 / 112.</div>
-</section>
-</main>
-
-<footer>
-<strong>Champi de Demain</strong><br>
-Découvrir. Comprendre. Préserver.
-<p>Projet indépendant en développement — données et périodes à vérifier et enrichir.</p>
-<small>© 2026 Champi de Demain · Image d’en-tête : <a href="https://unsplash.com/photos/photo-1504545102780-26774c1bb073" target="_blank" rel="noopener">Unsplash</a></small>
-</footer>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const SUPABASE_URL = "https://bydkbesdjrfcrsivmoru.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ohiW4Aeg0fNe0SaQu2FFkQ_anz2PoAO";
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const $ = id => document.getElementById(id);
 
-function addText(parent, tag, value) {
-  const el = document.createElement(tag);
-  el.textContent = value ?? "";
-  parent.appendChild(el);
-  return el;
+let observationMap = null;
+let observationMarker = null;
+let discoveriesMap = null;
+let discoveriesLayer = null;
+
+/* =========================================================
+   1. DATE AUTOMATIQUE
+========================================================= */
+
+const dateField = $("obs-datetime");
+
+if (dateField && !dateField.value) {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+
+  dateField.value = now.toISOString().slice(0, 16);
 }
 
-function showError(el, msg) {
-  el.textContent = msg;
-  el.classList.add("error");
+/* =========================================================
+   2. CARTE DE SELECTION DU LIEU
+========================================================= */
+
+function updateObservationPosition(latitude, longitude) {
+  $("obs-latitude").value = latitude;
+  $("obs-longitude").value = longitude;
+
+  $("obs-location-status").textContent =
+    "Position sélectionnée sur la carte.";
+
+  if (observationMarker) {
+    observationMarker.setLatLng([latitude, longitude]);
+  } else {
+    observationMarker = L.marker([latitude, longitude])
+      .addTo(observationMap);
+  }
 }
 
-function clearError(el) {
-  el.classList.remove("error");
-}
+function initializeObservationMap() {
+  const mapContainer = $("obs-location-map");
 
-function safety(value) {
-  if (value === "deadly") return ["Mortel — danger majeur", "danger"];
-  if (value === "toxic") return ["Toxique — ne pas consommer", "danger"];
-  return ["Comestibilité non renseignée", "warn"];
-}
-
-async function loadMushrooms() {
-  const status = $("species-status");
-  const grid = $("species-grid");
-  clearError(status);
-
-  const { data, error } = await supabase
-    .from("mushrooms")
-    .select("id,scientific_name,common_names,description,habitat,edibility,status")
-    .eq("status", "published")
-    .order("scientific_name");
-
-  if (error) {
-    console.error(error);
-    showError(status, "Chargement impossible : vérifiez les droits de lecture Supabase.");
+  if (!mapContainer || typeof L === "undefined") {
     return;
   }
 
-  grid.replaceChildren();
+  observationMap = L.map(mapContainer).setView([46.5, 2.5], 6);
 
-  if (!data?.length) {
-    status.textContent = "Aucune fiche publiée pour le moment.";
-    return;
-  }
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap"
+  }).addTo(observationMap);
 
-  status.textContent = data.length + " fiches chargées.";
-
-  for (const m of data) {
-    const card = document.createElement("article");
-    card.className = "card";
-    const c = document.createElement("div");
-    c.className = "card-content";
-
-    const names = Array.isArray(m.common_names) ? m.common_names : [];
-    addText(c, "h3", names[0] || m.scientific_name);
-    addText(c, "p", m.scientific_name).className = "scientific";
-
-    const [label, cls] = safety(m.edibility);
-    addText(c, "span", label).className = "tag " + cls;
-    addText(c, "span", m.status === "draft" ? "Fiche en brouillon" : "Fiche publiée").className = "tag";
-
-    if (m.description) addText(c, "p", m.description);
-    if (m.habitat) addText(c, "p", "Habitat indicatif : " + m.habitat);
-    addText(c, "p", "Identification à confirmer par un spécialiste. Aucune consommation ne peut être validée par cette fiche.");
-
-    card.appendChild(c);
-    grid.appendChild(card);
-  }
-}
-
-function renderRegions(data) {
-  const grid = $("regions-grid");
-  grid.replaceChildren();
-
-  for (const r of data || []) {
-    const card = document.createElement("article");
-    card.className = "card";
-    const c = document.createElement("div");
-    c.className = "card-content";
-
-    addText(c, "h3", r.name);
-    if (r.distance_km !== undefined && r.distance_km !== null) {
-      addText(c, "p", "Distance : " + r.distance_km + " km");
-    }
-    if (r.postal_code) addText(c, "p", "Code postal : " + r.postal_code);
-    if (r.description) addText(c, "p", r.description);
-
-    card.appendChild(c);
-    grid.appendChild(card);
-  }
-}
-
-async function loadRegions() {
-  const status = $("region-status");
-  clearError(status);
-
-  const { data, error } = await supabase
-    .from("regions")
-    .select("id,name,postal_code,description")
-    .order("name");
-
-  if (error) {
-    console.error(error);
-    showError(status, "Impossible de charger les territoires. Vérifiez les droits Supabase.");
-    return;
-  }
-
-  const list = data || [];
-  status.textContent = list.length + " territoires disponibles.";
-  renderRegions(list.filter(r => r.postal_code));
-}
-
-async function searchRegion() {
-  const status = $("region-status");
-  const postal = $("postal").value.trim();
-  const radius = Number($("radius").value);
-
-  clearError(status);
-
-  if (!/^\d{5}$/.test(postal)) {
-    showError(status, "Saisissez un code postal à 5 chiffres.");
-    return;
-  }
-
-  status.textContent = "Calcul de votre secteur…";
-
-  const { data, error } = await supabase.rpc("nearby_regions", {
-    p_postal_code: postal,
-    p_radius_km: radius
+  observationMap.on("click", event => {
+    updateObservationPosition(
+      event.latlng.lat,
+      event.latlng.lng
+    );
   });
 
+  setTimeout(() => observationMap.invalidateSize(), 300);
+}
+
+/* =========================================================
+   3. GEOLOCALISATION GPS
+========================================================= */
+
+const gpsButton = $("obs-geolocate");
+
+if (gpsButton) {
+  gpsButton.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      $("obs-location-status").textContent =
+        "La géolocalisation n'est pas disponible sur cet appareil.";
+      return;
+    }
+
+    $("obs-location-status").textContent =
+      "Recherche de votre position GPS…";
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        if (!observationMap) {
+          initializeObservationMap();
+        }
+
+        observationMap.setView([latitude, longitude], 14);
+
+        updateObservationPosition(latitude, longitude);
+      },
+
+      error => {
+        console.error("GPS :", error);
+
+        $("obs-location-status").textContent =
+          "Position inaccessible. Vous pouvez choisir le lieu directement sur la carte.";
+      },
+
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
+  });
+}
+
+initializeObservationMap();
+
+/* =========================================================
+   4. CARTE DES DECOUVERTES
+========================================================= */
+
+function initializeDiscoveriesMap() {
+  const container = $("community-map");
+
+  if (!container || typeof L === "undefined") {
+    return;
+  }
+
+  discoveriesMap = L.map(container).setView([46.5, 2.5], 6);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap"
+  }).addTo(discoveriesMap);
+
+  discoveriesLayer = L.layerGroup().addTo(discoveriesMap);
+
+  setTimeout(() => discoveriesMap.invalidateSize(), 300);
+}
+
+/* =========================================================
+   5. CHARGEMENT DE LA CARTE PUBLIQUE OU PERSONNELLE
+========================================================= */
+
+async function loadDiscoveries(mode) {
+  if (!discoveriesMap || !discoveriesLayer) {
+    return;
+  }
+
+  discoveriesLayer.clearLayers();
+
+  const status = $("community-map-status");
+
+  status.textContent = "Chargement des découvertes…";
+
+  let query = supabase
+    .from("observations")
+    .select(`
+      id,
+      observation_date,
+      observed_at,
+      description,
+      approximate_location,
+      latitude,
+      longitude,
+      visibility,
+      status
+    `);
+
+  /* CARTE COMMUNAUTAIRE */
+  if (mode === "public") {
+    query = query
+      .eq("visibility", "public")
+      .eq("status", "approved");
+  }
+
+  /* CARTE PERSONNELLE */
+  if (mode === "personal") {
+    const { data: authData, error: authError } =
+      await supabase.auth.getUser();
+
+    if (authError || !authData?.user) {
+      status.textContent =
+        "Connectez-vous pour consulter votre carte personnelle.";
+
+      return;
+    }
+
+    query = query.eq("user_id", authData.user.id);
+  }
+
+  const { data, error } = await query
+    .not("latitude", "is", null)
+    .not("longitude", "is", null)
+    .order("observation_date", {
+      ascending: false
+    })
+    .limit(500);
+
   if (error) {
-    console.error(error);
-    showError(status, "Erreur de recherche géographique.");
+    console.error("Carte :", error);
+
+    status.textContent =
+      "Impossible de charger les découvertes. Vérifiez la connexion.";
+
     return;
   }
 
-  const sortedData = (data || []).slice().sort(
-    (a, b) => Number(a.distance_km) - Number(b.distance_km)
-  );
+  if (!data || data.length === 0) {
+    status.textContent =
+      mode === "public"
+        ? "Aucune découverte publique validée pour le moment."
+        : "Votre carte personnelle ne contient aucune découverte géolocalisée.";
 
-  renderRegions(sortedData);
-
-  status.textContent = sortedData.length
-    ? sortedData.length + " commune(s) dans un rayon de " + radius + " km."
-    : "Aucune commune enregistrée dans ce rayon.";
-}
-
-async function loadSeasons() {
-  const status = $("season-status");
-  const grid = $("seasons-grid");
-  clearError(status);
-
-  const { data, error } = await supabase
-    .from("seasons")
-    .select("month,conditions,mushrooms(scientific_name,common_names)")
-    .order("month");
-
-  if (error) {
-    console.error(error);
-    showError(status, "Impossible de charger les saisons. Vérifiez les droits Supabase.");
     return;
   }
 
-  grid.replaceChildren();
+  const coordinates = [];
 
-  if (!data?.length) {
-    status.textContent = "Aucune période enregistrée.";
-    return;
+  /* CREATION DES MARQUEURS */
+
+  for (const observation of data) {
+    const latitude = Number(observation.latitude);
+    const longitude = Number(observation.longitude);
+
+    if (
+      !Number.isFinite(latitude) ||
+      !Number.isFinite(longitude)
+    ) {
+      continue;
+    }
+
+    const marker = L.marker([latitude, longitude]);
+
+    const popup = document.createElement("div");
+
+    const title = document.createElement("strong");
+
+    title.textContent =
+      observation.approximate_location ||
+      "Découverte de champignon";
+
+    const date = document.createElement("p");
+
+    date.textContent = observation.observation_date
+      ? new Date(
+          observation.observation_date + "T12:00:00"
+        ).toLocaleDateString("fr-FR")
+      : "Date inconnue";
+
+    const description = document.createElement("p");
+
+    description.textContent =
+      observation.description ||
+      "Aucune description renseignée.";
+
+    popup.appendChild(title);
+    popup.appendChild(date);
+    popup.appendChild(description);
+
+    marker.bindPopup(popup);
+
+    marker.addTo(discoveriesLayer);
+
+    coordinates.push([latitude, longitude]);
   }
 
-  status.textContent = data.length + " périodes indicatives chargées.";
-
-  const months = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
-
-  for (const s of data) {
-    const card = document.createElement("article");
-    card.className = "card";
-    const c = document.createElement("div");
-    c.className = "card-content";
-
-    const m = s.mushrooms || {};
-    const names = Array.isArray(m.common_names) ? m.common_names : [];
-
-    addText(c, "h3", names[0] || m.scientific_name || "Champignon");
-    addText(c, "p", months[s.month - 1] || "Mois non renseigné");
-    if (s.conditions) addText(c, "p", s.conditions);
-
-    card.appendChild(c);
-    grid.appendChild(card);
-  }
-}
-
-/* ---------- Carnet d'observation ---------- */
-
-let observationText = "";
-
-function createObservation() {
-  const result = $("observation-result");
-  result.replaceChildren();
-
-  const fields = [
-    ["Milieu", $("obs-habitat").value],
-    ["Sous le chapeau", $("obs-under").value],
-    ["Forme du chapeau", $("obs-cap").value],
-    ["Pied", $("obs-stem").value],
-    ["Anneau et volve", $("obs-ring").value],
-    ["Autres détails", $("obs-color").value.trim()]
-  ];
-
-  addText(result, "h3", "Ma fiche d'observation");
-
-  const list = document.createElement("ul");
-  const lines = ["Fiche d'observation — Champi de Demain"];
-
-  for (const [label, value] of fields) {
-    const line = label + " : " + (value || "Non renseigné");
-    addText(list, "li", line);
-    lines.push(line);
-  }
-  result.appendChild(list);
-
-  const disclaimer = "Fiche descriptive uniquement : elle ne permet pas d'identifier avec certitude le champignon ni de confirmer sa comestibilité.";
-  addText(result, "p", disclaimer);
-  lines.push("", disclaimer);
-  observationText = lines.join("\n");
-
-  const copy = addText(result, "button", "Copier la fiche");
-  copy.type = "button";
-  copy.className = "btn secondary";
-  copy.addEventListener("click", copyObservation);
-
-  const print = addText(result, "button", "Imprimer la fiche");
-  print.type = "button";
-  print.className = "btn secondary";
-  print.addEventListener("click", () => window.print());
-}
-
-async function copyObservation(event) {
-  const btn = event.currentTarget;
-  try {
-    await navigator.clipboard.writeText(observationText);
-    btn.textContent = "Fiche copiée ✓";
-  } catch (err) {
-    console.error(err);
-    btn.textContent = "Copie impossible : sélectionnez le texte à la main";
-  }
-}
-
-function handlePhotoChange(event) {
-  const file = event.target.files[0];
-  const preview = $("obs-photo-preview");
-
-  if (preview.src.startsWith("blob:")) URL.revokeObjectURL(preview.src);
-
-  if (!file || !file.type.startsWith("image/")) {
-    if (file) alert("Choisissez une image.");
-    event.target.value = "";
-    preview.hidden = true;
-    preview.removeAttribute("src");
-    return;
-  }
-
-  preview.src = URL.createObjectURL(file);
-  preview.hidden = false;
-}
-
-/* ---------- Écouteurs ---------- */
-
-$("obs-photo").addEventListener("change", handlePhotoChange);
-$("create-observation").addEventListener("click", createObservation);
-$("search-region").addEventListener("click", searchRegion);
-$("postal").addEventListener("keydown", e => {
-  if (e.key === "Enter") searchRegion();
-});
-
-/* ---------- Démarrage ---------- */
-
-if (SUPABASE_KEY.startsWith("sb_publishable_")) {
-  // allSettled : une requête en échec n'empêche pas les autres sections de s'afficher
-  await Promise.allSettled([loadMushrooms(), loadRegions(), loadSeasons()]);
-} else {
-  $("species-status").textContent = "Configuration requise : ajoutez votre clé publiable Supabase dans index.html.";
-  $("region-status").textContent = "Configuration Supabase requise.";
-  $("season-status").textContent = "Configuration Supabase requise.";
-}
-</script>
-<script type="module" src="./auth-observations.js?v=20261119-2"></script>
-
-<!-- CHAMPI DE DEMAIN — PROGRESSION DU CARNET -->
-<style>
-.observation-progress {
-  margin: 0 0 30px;
-  padding: 20px;
-  background: #f0f2e9;
-  border: 1px solid #dfe4d8;
-  border-radius: 16px;
-}
-
-.progress-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 13px;
-  color: #183d2c;
-  font: 15px Arial, sans-serif;
-}
-
-#observation-progress-text {
-  font-weight: bold;
-}
-
-.progress-track {
-  width: 100%;
-  height: 11px;
-  overflow: hidden;
-  background: #d9dfd2;
-  border-radius: 20px;
-}
-
-#observation-progress-bar {
-  width: 0;
-  height: 100%;
-  background: #183d2c;
-  border-radius: 20px;
-  transition: width .3s ease;
-}
-
-.progress-message {
-  margin: 12px 0 0;
-  color: #536b58;
-  font: 14px/1.5 Arial, sans-serif;
-}
-
-@media(max-width:600px) {
-  .observation-progress {
-    padding: 16px;
-    margin-bottom: 24px;
-  }
-
-  .progress-heading {
-    font-size: 14px;
-  }
-}
-
-@media(prefers-reduced-motion:reduce) {
-  #observation-progress-bar {
-    transition: none;
-  }
-}
-</style>
-
-<script>
-(function () {
-  const form = document.querySelector("#observation .search-area");
-  if (!form || form.querySelector(".observation-progress")) return;
-
-  const fields = [
-    "obs-habitat",
-    "obs-under",
-    "obs-cap",
-    "obs-stem",
-    "obs-ring",
-    "obs-color"
-  ];
-
-  const progress = document.createElement("div");
-  progress.className = "observation-progress";
-  progress.setAttribute("aria-live", "polite");
-
-  progress.innerHTML = `
-    <div class="progress-heading">
-      <strong>Votre observation</strong>
-      <span id="observation-progress-text">0 / 6 questions</span>
-    </div>
-    <div
-      class="progress-track"
-      role="progressbar"
-      aria-label="Progression du carnet d'observation"
-      aria-valuemin="0"
-      aria-valuemax="6"
-      aria-valuenow="0"
-    >
-      <div id="observation-progress-bar"></div>
-    </div>
-    <p class="progress-message" id="observation-progress-message">
-      Commencez à renseigner votre observation.
-    </p>
-  `;
-
-  form.prepend(progress);
-
-  const bar = progress.querySelector("#observation-progress-bar");
-  const counter = progress.querySelector("#observation-progress-text");
-  const message = progress.querySelector("#observation-progress-message");
-  const track = progress.querySelector(".progress-track");
-
-  function updateProgress() {
-    let completed = 0;
-
-    fields.forEach(id => {
-      const field = document.getElementById(id);
-      if (field && field.value.trim() !== "") completed++;
+  if (coordinates.length > 0) {
+    discoveriesMap.fitBounds(coordinates, {
+      padding: [30, 30],
+      maxZoom: 12
     });
-
-    const percentage = (completed / fields.length) * 100;
-
-    bar.style.width = percentage + "%";
-    counter.textContent = completed + " / 6 questions";
-    track.setAttribute("aria-valuenow", completed);
-
-    if (completed === 0) {
-      message.textContent = "Commencez à renseigner votre observation.";
-    } else if (completed < 6) {
-      message.textContent = "Très bien ! Continuez, votre fiche prend forme.";
-    } else {
-      message.textContent = "Vos 6 réponses sont renseignées. Vous pouvez créer votre fiche !";
-    }
   }
 
-  fields.forEach(id => {
-    const field = document.getElementById(id);
-    if (field) {
-      field.addEventListener("input", updateProgress);
-      field.addEventListener("change", updateProgress);
-    }
+  status.textContent =
+    coordinates.length +
+    (mode === "public"
+      ? " découverte(s) publique(s) validée(s)."
+      : " découverte(s) dans votre carte personnelle.");
+}
+
+/* =========================================================
+   6. BOUTONS DES CARTES
+========================================================= */
+
+const publicButton = $("show-public-map");
+const personalButton = $("show-personal-map");
+
+if (publicButton) {
+  publicButton.addEventListener("click", () => {
+    loadDiscoveries("public");
   });
+}
 
-  updateProgress();
-})();
+if (personalButton) {
+  personalButton.addEventListener("click", () => {
+    loadDiscoveries("personal");
+  });
+}
+
+/* =========================================================
+   7. DEMARRAGE
+========================================================= */
+
+initializeDiscoveriesMap();
+
+if (discoveriesMap) {
+  loadDiscoveries("public");
+}
+
 </script>
-<!-- FIN DE LA PROGRESSION DU CARNET -->
-
-</body>
-</html>
