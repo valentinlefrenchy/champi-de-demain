@@ -1,37 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Champi de Demain 🍄</title>
+
+  <meta name="description" content="Explorez les champignons, observez la nature et partagez vos découvertes avec Champi de Demain.">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f4ed;
+      color: #243329;
+    }
+
+    header {
+      background: #193c2b;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    header p {
+      margin-top: 10px;
+      opacity: 0.85;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+
+    h2 {
+      color: #193c2b;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 5px;
+      background: #285d40;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #397850;
+    }
+
+    button.secondary {
+      background: #dfe9df;
+      color: #193c2b;
+    }
+
+    #community-map,
+    #obs-location-map {
+      width: 100%;
+      height: 350px;
+      border-radius: 15px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    #status,
+    #obs-location-status {
+      margin-top: 15px;
+      color: #526a58;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #d5ddd5;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .warning {
+      background: #fff3d8;
+      border-left: 5px solid #d99c32;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      background: #193c2b;
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 26px;
+      }
+
+      main {
+        padding: 12px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      #community-map,
+      #obs-location-map {
+        height: 300px;
+      }
+
+      button {
+        width: 100%;
+        margin: 5px 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🍄 Champi de Demain</h1>
+  <p>Explorez, observez et partagez la nature</p>
+</header>
+
+<main>
+
+  <section class="card">
+    <h2>🌍 Carte des découvertes</h2>
+
+    <p>
+      Découvrez les observations partagées par la communauté
+      ou consultez votre propre carnet géographique.
+    </p>
+
+    <button id="show-public-map">
+      🌍 Carte communautaire
+    </button>
+
+    <button id="show-personal-map" class="secondary">
+      📍 Ma carte personnelle
+    </button>
+
+    <div id="community-map"></div>
+
+    <p id="community-map-status">
+      Chargement de la carte...
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>📍 Localiser une observation</h2>
+
+    <p>
+      Cliquez sur la carte pour sélectionner un lieu
+      ou utilisez votre position GPS.
+    </p>
+
+    <button id="obs-geolocate">
+      📱 Utiliser ma position GPS
+    </button>
+
+    <div id="obs-location-map"></div>
+
+    <p id="obs-location-status">
+      Cliquez sur la carte pour choisir votre emplacement.
+    </p>
+
+    <input
+      type="hidden"
+      id="obs-latitude"
+    >
+
+    <input
+      type="hidden"
+      id="obs-longitude"
+    >
+  </section>
+
+  <section class="card">
+    <h2>📓 Mon carnet d'observation</h2>
+
+    <p>
+      Cette fonctionnalité sera reliée à votre compte utilisateur
+      pour sauvegarder vos observations.
+    </p>
+
+    <div class="warning">
+      ⚠️ Une identification de champignon à partir d'une photographie
+      ne garantit jamais sa comestibilité. Ne consommez jamais un
+      champignon sur la seule base d'une identification numérique.
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  🍄 Champi de Demain — Observer la nature, apprendre et partager
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const SUPABASE_URL = "https://bydkbesdjrfcrsivmoru.supabase.co";
-const SUPABASE_KEY = "sb_publishable_ohiW4Aeg0fNe0SaQu2FFkQ_anz2PoAO";
+import { createClient } from
+"https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+"https://bydkbesdjrfcrsivmoru.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_ohiW4Aeg0fNe0SaQu2FFkQ_anz2PoAO";
+
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+/* =========================================================
+   VARIABLES
+========================================================= */
 
 const $ = id => document.getElementById(id);
 
 let observationMap = null;
 let observationMarker = null;
+
 let discoveriesMap = null;
 let discoveriesLayer = null;
 
 /* =========================================================
-   1. DATE AUTOMATIQUE
-========================================================= */
-
-const dateField = $("obs-datetime");
-
-if (dateField && !dateField.value) {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-
-  dateField.value = now.toISOString().slice(0, 16);
-}
-
-/* =========================================================
-   2. CARTE DE SELECTION DU LIEU
+   CARTE DE LOCALISATION
 ========================================================= */
 
 function updateObservationPosition(latitude, longitude) {
+
   $("obs-latitude").value = latitude;
   $("obs-longitude").value = longitude;
 
@@ -39,112 +273,159 @@ function updateObservationPosition(latitude, longitude) {
     "Position sélectionnée sur la carte.";
 
   if (observationMarker) {
-    observationMarker.setLatLng([latitude, longitude]);
+
+    observationMarker.setLatLng([
+      latitude,
+      longitude
+    ]);
+
   } else {
-    observationMarker = L.marker([latitude, longitude])
-      .addTo(observationMap);
+
+    observationMarker = L.marker([
+      latitude,
+      longitude
+    ]).addTo(observationMap);
+
   }
+
 }
 
 function initializeObservationMap() {
+
   const mapContainer = $("obs-location-map");
 
   if (!mapContainer || typeof L === "undefined") {
     return;
   }
 
-  observationMap = L.map(mapContainer).setView([46.5, 2.5], 6);
+  observationMap = L.map(mapContainer).setView(
+    [46.5, 2.5],
+    6
+  );
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap"
-  }).addTo(observationMap);
+  L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      attribution: "&copy; OpenStreetMap"
+    }
+  ).addTo(observationMap);
 
   observationMap.on("click", event => {
+
     updateObservationPosition(
       event.latlng.lat,
       event.latlng.lng
     );
+
   });
 
-  setTimeout(() => observationMap.invalidateSize(), 300);
+  setTimeout(() => {
+    observationMap.invalidateSize();
+  }, 300);
+
 }
 
 /* =========================================================
-   3. GEOLOCALISATION GPS
+   GPS
 ========================================================= */
 
 const gpsButton = $("obs-geolocate");
 
-if (gpsButton) {
-  gpsButton.addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      $("obs-location-status").textContent =
-        "La géolocalisation n'est pas disponible sur cet appareil.";
-      return;
-    }
+gpsButton.addEventListener("click", () => {
+
+  if (!navigator.geolocation) {
 
     $("obs-location-status").textContent =
-      "Recherche de votre position GPS…";
+      "La géolocalisation n'est pas disponible.";
 
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+    return;
 
-        if (!observationMap) {
-          initializeObservationMap();
-        }
+  }
 
-        observationMap.setView([latitude, longitude], 14);
+  $("obs-location-status").textContent =
+    "Recherche de votre position GPS...";
 
-        updateObservationPosition(latitude, longitude);
-      },
+  navigator.geolocation.getCurrentPosition(
 
-      error => {
-        console.error("GPS :", error);
+    position => {
 
-        $("obs-location-status").textContent =
-          "Position inaccessible. Vous pouvez choisir le lieu directement sur la carte.";
-      },
+      const latitude =
+        position.coords.latitude;
 
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0
-      }
-    );
-  });
-}
+      const longitude =
+        position.coords.longitude;
 
-initializeObservationMap();
+      observationMap.setView(
+        [latitude, longitude],
+        14
+      );
+
+      updateObservationPosition(
+        latitude,
+        longitude
+      );
+
+    },
+
+    error => {
+
+      console.error(error);
+
+      $("obs-location-status").textContent =
+        "Position inaccessible. Choisissez votre emplacement sur la carte.";
+
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    }
+
+  );
+
+});
 
 /* =========================================================
-   4. CARTE DES DECOUVERTES
+   CARTE COMMUNAUTAIRE
 ========================================================= */
 
 function initializeDiscoveriesMap() {
+
   const container = $("community-map");
 
   if (!container || typeof L === "undefined") {
     return;
   }
 
-  discoveriesMap = L.map(container).setView([46.5, 2.5], 6);
+  discoveriesMap = L.map(container).setView(
+    [46.5, 2.5],
+    6
+  );
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap"
-  }).addTo(discoveriesMap);
+  L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      attribution: "&copy; OpenStreetMap"
+    }
+  ).addTo(discoveriesMap);
 
-  discoveriesLayer = L.layerGroup().addTo(discoveriesMap);
+  discoveriesLayer = L.layerGroup().addTo(
+    discoveriesMap
+  );
 
-  setTimeout(() => discoveriesMap.invalidateSize(), 300);
+  setTimeout(() => {
+    discoveriesMap.invalidateSize();
+  }, 300);
+
 }
 
 /* =========================================================
-   5. CHARGEMENT DE LA CARTE PUBLIQUE OU PERSONNELLE
+   CHARGEMENT DES OBSERVATIONS
 ========================================================= */
 
 async function loadDiscoveries(mode) {
+
   if (!discoveriesMap || !discoveriesLayer) {
     return;
   }
@@ -153,7 +434,8 @@ async function loadDiscoveries(mode) {
 
   const status = $("community-map-status");
 
-  status.textContent = "Chargement des découvertes…";
+  status.textContent =
+    "Chargement des découvertes...";
 
   let query = supabase
     .from("observations")
@@ -169,29 +451,45 @@ async function loadDiscoveries(mode) {
       status
     `);
 
-  /* CARTE COMMUNAUTAIRE */
+  /* CARTE PUBLIQUE */
+
   if (mode === "public") {
+
     query = query
       .eq("visibility", "public")
       .eq("status", "approved");
+
   }
 
   /* CARTE PERSONNELLE */
+
   if (mode === "personal") {
-    const { data: authData, error: authError } =
-      await supabase.auth.getUser();
+
+    const {
+      data: authData,
+      error: authError
+    } = await supabase.auth.getUser();
 
     if (authError || !authData?.user) {
+
       status.textContent =
         "Connectez-vous pour consulter votre carte personnelle.";
 
       return;
+
     }
 
-    query = query.eq("user_id", authData.user.id);
+    query = query.eq(
+      "user_id",
+      authData.user.id
+    );
+
   }
 
-  const { data, error } = await query
+  const {
+    data,
+    error
+  } = await query
     .not("latitude", "is", null)
     .not("longitude", "is", null)
     .order("observation_date", {
@@ -200,30 +498,38 @@ async function loadDiscoveries(mode) {
     .limit(500);
 
   if (error) {
-    console.error("Carte :", error);
+
+    console.error(error);
 
     status.textContent =
-      "Impossible de charger les découvertes. Vérifiez la connexion.";
+      "Impossible de charger les découvertes.";
 
     return;
+
   }
 
   if (!data || data.length === 0) {
+
     status.textContent =
       mode === "public"
         ? "Aucune découverte publique validée pour le moment."
         : "Votre carte personnelle ne contient aucune découverte géolocalisée.";
 
     return;
+
   }
 
   const coordinates = [];
 
-  /* CREATION DES MARQUEURS */
+  /* MARQUEURS */
 
   for (const observation of data) {
-    const latitude = Number(observation.latitude);
-    const longitude = Number(observation.longitude);
+
+    const latitude =
+      Number(observation.latitude);
+
+    const longitude =
+      Number(observation.longitude);
 
     if (
       !Number.isFinite(latitude) ||
@@ -232,7 +538,10 @@ async function loadDiscoveries(mode) {
       continue;
     }
 
-    const marker = L.marker([latitude, longitude]);
+    const marker = L.marker([
+      latitude,
+      longitude
+    ]);
 
     const popup = document.createElement("div");
 
@@ -244,11 +553,13 @@ async function loadDiscoveries(mode) {
 
     const date = document.createElement("p");
 
-    date.textContent = observation.observation_date
-      ? new Date(
-          observation.observation_date + "T12:00:00"
-        ).toLocaleDateString("fr-FR")
-      : "Date inconnue";
+    date.textContent =
+      observation.observation_date
+        ? new Date(
+            observation.observation_date +
+            "T12:00:00"
+          ).toLocaleDateString("fr-FR")
+        : "Date inconnue";
 
     const description = document.createElement("p");
 
@@ -264,50 +575,64 @@ async function loadDiscoveries(mode) {
 
     marker.addTo(discoveriesLayer);
 
-    coordinates.push([latitude, longitude]);
+    coordinates.push([
+      latitude,
+      longitude
+    ]);
+
   }
 
   if (coordinates.length > 0) {
-    discoveriesMap.fitBounds(coordinates, {
-      padding: [30, 30],
-      maxZoom: 12
-    });
+
+    discoveriesMap.fitBounds(
+      coordinates,
+      {
+        padding: [30, 30],
+        maxZoom: 12
+      }
+    );
+
   }
 
   status.textContent =
     coordinates.length +
-    (mode === "public"
-      ? " découverte(s) publique(s) validée(s)."
-      : " découverte(s) dans votre carte personnelle.");
+    (
+      mode === "public"
+        ? " découverte(s) publique(s) validée(s)."
+        : " découverte(s) dans votre carte personnelle."
+    );
+
 }
 
 /* =========================================================
-   6. BOUTONS DES CARTES
+   BOUTONS
 ========================================================= */
 
-const publicButton = $("show-public-map");
-const personalButton = $("show-personal-map");
+$("show-public-map").addEventListener(
+  "click",
+  () => loadDiscoveries("public")
+);
 
-if (publicButton) {
-  publicButton.addEventListener("click", () => {
-    loadDiscoveries("public");
-  });
-}
-
-if (personalButton) {
-  personalButton.addEventListener("click", () => {
-    loadDiscoveries("personal");
-  });
-}
+$("show-personal-map").addEventListener(
+  "click",
+  () => loadDiscoveries("personal")
+);
 
 /* =========================================================
-   7. DEMARRAGE
+   INITIALISATION
 ========================================================= */
+
+initializeObservationMap();
 
 initializeDiscoveriesMap();
 
 if (discoveriesMap) {
+
   loadDiscoveries("public");
+
 }
 
 </script>
+
+</body>
+</html>
