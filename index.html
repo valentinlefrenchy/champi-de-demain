@@ -736,5 +736,152 @@ if (SUPABASE_KEY.startsWith("sb_publishable_")) {
 }
 </script>
 <script type="module" src="./auth-observations.js?v=20261119-2"></script>
+
+<!-- CHAMPI DE DEMAIN — PROGRESSION DU CARNET -->
+<style>
+.observation-progress {
+  margin: 0 0 30px;
+  padding: 20px;
+  background: #f0f2e9;
+  border: 1px solid #dfe4d8;
+  border-radius: 16px;
+}
+
+.progress-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 13px;
+  color: #183d2c;
+  font: 15px Arial, sans-serif;
+}
+
+#observation-progress-text {
+  font-weight: bold;
+}
+
+.progress-track {
+  width: 100%;
+  height: 11px;
+  overflow: hidden;
+  background: #d9dfd2;
+  border-radius: 20px;
+}
+
+#observation-progress-bar {
+  width: 0;
+  height: 100%;
+  background: #183d2c;
+  border-radius: 20px;
+  transition: width .3s ease;
+}
+
+.progress-message {
+  margin: 12px 0 0;
+  color: #536b58;
+  font: 14px/1.5 Arial, sans-serif;
+}
+
+@media(max-width:600px) {
+  .observation-progress {
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+
+  .progress-heading {
+    font-size: 14px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  #observation-progress-bar {
+    transition: none;
+  }
+}
+</style>
+
+<script>
+(function () {
+  const form = document.querySelector("#observation .search-area");
+  if (!form || form.querySelector(".observation-progress")) return;
+
+  const fields = [
+    "obs-habitat",
+    "obs-under",
+    "obs-cap",
+    "obs-stem",
+    "obs-ring",
+    "obs-color"
+  ];
+
+  const progress = document.createElement("div");
+  progress.className = "observation-progress";
+  progress.setAttribute("aria-live", "polite");
+
+  progress.innerHTML = `
+    <div class="progress-heading">
+      <strong>Votre observation</strong>
+      <span id="observation-progress-text">0 / 6 questions</span>
+    </div>
+    <div
+      class="progress-track"
+      role="progressbar"
+      aria-label="Progression du carnet d'observation"
+      aria-valuemin="0"
+      aria-valuemax="6"
+      aria-valuenow="0"
+    >
+      <div id="observation-progress-bar"></div>
+    </div>
+    <p class="progress-message" id="observation-progress-message">
+      Commencez à renseigner votre observation.
+    </p>
+  `;
+
+  form.prepend(progress);
+
+  const bar = progress.querySelector("#observation-progress-bar");
+  const counter = progress.querySelector("#observation-progress-text");
+  const message = progress.querySelector("#observation-progress-message");
+  const track = progress.querySelector(".progress-track");
+
+  function updateProgress() {
+    let completed = 0;
+
+    fields.forEach(id => {
+      const field = document.getElementById(id);
+      if (field && field.value.trim() !== "") completed++;
+    });
+
+    const percentage = (completed / fields.length) * 100;
+
+    bar.style.width = percentage + "%";
+    counter.textContent = completed + " / 6 questions";
+    track.setAttribute("aria-valuenow", completed);
+
+    if (completed === 0) {
+      message.textContent = "Commencez à renseigner votre observation.";
+    } else if (completed < 6) {
+      message.textContent = "Très bien ! Continuez, votre fiche prend forme.";
+    } else {
+      message.textContent = "Vos 6 réponses sont renseignées. Vous pouvez créer votre fiche !";
+    }
+  }
+
+  fields.forEach(id => {
+    const field = document.getElementById(id);
+    if (field) {
+      field.addEventListener("input", updateProgress);
+      field.addEventListener("change", updateProgress);
+    }
+  });
+
+  updateProgress();
+})();
+</script>
+<!-- FIN DE LA PROGRESSION DU CARNET -->
+
 </body>
 </html>
