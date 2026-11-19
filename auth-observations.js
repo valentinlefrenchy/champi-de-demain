@@ -20,16 +20,15 @@ const TYPES = {
 
 const $ = id => document.getElementById(id);
 
-function node(tag, text, cls) {
-  const element = document.createElement(tag);
-  if (text) element.textContent = text;
-  if (cls) element.className = cls;
-  return element;
+function node(tag, text) {
+  const el = document.createElement(tag);
+  if (text) el.textContent = text;
+  return el;
 }
 
-function message(element, text, error = false) {
-  element.textContent = text;
-  element.classList.toggle("error", error);
+function message(el, text, error = false) {
+  el.textContent = text;
+  el.style.color = error ? "#a12d25" : "#536456";
 }
 
 function makeInput(id, type, placeholder, autocomplete) {
@@ -39,7 +38,7 @@ function makeInput(id, type, placeholder, autocomplete) {
   input.placeholder = placeholder;
   input.autocomplete = autocomplete;
   input.style.cssText =
-    "display:block;width:100%;box-sizing:border-box;margin:9px 0;padding:13px 14px;border:1px solid #c6cbbb;border-radius:9px;background:#fffefa;color:#26352b;font:16px Arial,sans-serif";
+    "display:block;width:100%;box-sizing:border-box;margin:10px 0;padding:14px;border:1px solid #c6cbbb;border-radius:10px;background:#fffefa;color:#26352b;font:16px Arial,sans-serif";
   return input;
 }
 
@@ -48,23 +47,23 @@ function makeButton(id, text, primary = false) {
   button.id = id;
   button.type = "button";
   button.style.cssText = primary
-    ? "display:block;width:100%;padding:13px 14px;margin:10px 0 0;border:1px solid #183d2c;border-radius:9px;background:#183d2c;color:white;font:bold 16px Arial,sans-serif;cursor:pointer"
-    : "display:block;width:100%;padding:12px 14px;margin:9px 0 0;border:1px solid #183d2c;border-radius:9px;background:#fffefa;color:#183d2c;font:bold 15px Arial,sans-serif;cursor:pointer";
+    ? "width:100%;padding:14px;margin:9px 0 0;border:1px solid #183d2c;border-radius:10px;background:#183d2c;color:white;font:bold 16px Arial,sans-serif;cursor:pointer"
+    : "width:100%;padding:13px;margin:9px 0 0;border:1px solid #183d2c;border-radius:10px;background:#fffefa;color:#183d2c;font:bold 15px Arial,sans-serif;cursor:pointer";
   return button;
 }
 
 function makeCard(title, description) {
-  const card = node("div");
+  const card = node("section");
   card.style.cssText =
-    "min-width:0;padding:18px;background:#fffefa;border:1px solid #dedfd2;border-radius:14px;box-shadow:0 4px 14px rgba(24,61,44,.06)";
+    "min-width:0;padding:20px;background:#fffefa;border:1px solid #dedfd2;border-radius:16px;box-shadow:0 5px 18px rgba(24,61,44,.07)";
 
   const heading = node("h3", title);
   heading.style.cssText =
-    "margin:0 0 7px;color:#183d2c;font-size:21px";
+    "margin:0 0 8px;color:#183d2c;font-size:22px";
 
   const intro = node("p", description);
   intro.style.cssText =
-    "margin:0 0 14px;color:#667267;font:14px/1.5 Arial,sans-serif";
+    "margin:0 0 16px;color:#667267;font:15px/1.5 Arial,sans-serif";
 
   card.append(heading, intro);
   return card;
@@ -77,26 +76,24 @@ function setupPanel() {
   const panel = node("section");
   panel.id = "champi-account";
   panel.style.cssText =
-    "display:block;padding:24px 5%;background:#f6f3e9;border-bottom:1px solid #e2dfd2";
+    "padding:25px 5%;background:#f6f3e9;border-bottom:1px solid #e2dfd2";
 
   const container = node("div");
-  container.style.cssText =
-    "max-width:1050px;margin:0 auto";
+  container.style.cssText = "max-width:900px;margin:0 auto";
 
   const title = node("h2", "Mon espace personnel");
   title.style.cssText =
-    "margin:0 0 8px;color:#183d2c;font-size:26px;text-align:center";
+    "margin:0 0 8px;text-align:center;color:#183d2c;font-size:27px";
 
   const intro = node(
     "p",
-    "Retrouvez votre carnet ou créez votre espace Champi de Demain."
+    "Bienvenue dans votre espace Champi de Demain."
   );
   intro.style.cssText =
-    "margin:0 auto 20px;max-width:650px;text-align:center;color:#667267;font:15px/1.5 Arial,sans-serif";
+    "margin:0 auto 22px;text-align:center;color:#667267;font:15px/1.5 Arial,sans-serif";
 
   const cards = node("div");
-  cards.style.cssText =
-    "display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start";
+  cards.className = "champi-auth-cards";
 
   const loginCard = makeCard(
     "Se connecter",
@@ -108,7 +105,7 @@ function setupPanel() {
     "Rejoignez Champi de Demain et conservez vos observations."
   );
 
-  // Carte de connexion : ses propres champs.
+  // CONNEXION : les champs sont visibles immédiatement.
   const loginEmail = makeInput(
     "champi-login-email",
     "email",
@@ -141,7 +138,18 @@ function setupPanel() {
     forgotButton
   );
 
-  // Carte de création : champs indépendants.
+  // INSCRIPTION : seul le bouton est visible au départ.
+  const signupStart = makeButton(
+    "champi-show-signup",
+    "Créer un compte",
+    true
+  );
+
+  const signupForm = node("div");
+  signupForm.id = "champi-signup-form";
+  signupForm.hidden = true;
+  signupForm.style.marginTop = "12px";
+
   const signupEmail = makeInput(
     "champi-signup-email",
     "email",
@@ -152,66 +160,86 @@ function setupPanel() {
   const signupPassword = makeInput(
     "champi-signup-password",
     "password",
-    "Choisissez un mot de passe (8 caractères minimum)",
+    "Mot de passe (8 caractères minimum)",
     "new-password"
   );
 
   const signupConfirm = makeInput(
     "champi-signup-confirm",
     "password",
-    "Confirmez votre mot de passe",
+    "Confirmer le mot de passe",
     "new-password"
   );
 
   const signupButton = makeButton(
     "champi-signup-button",
-    "Créer mon compte",
+    "Valider mon inscription",
     true
   );
 
-  signupCard.append(
+  const signupCancel = makeButton(
+    "champi-signup-cancel",
+    "Annuler"
+  );
+
+  signupForm.append(
     signupEmail,
     signupPassword,
     signupConfirm,
-    signupButton
+    signupButton,
+    signupCancel
   );
 
+  signupCard.append(signupStart, signupForm);
   cards.append(loginCard, signupCard);
 
-  // Affichage mobile : les deux cartes l'une sous l'autre.
   const style = node("style");
   style.textContent = `
-    @media(max-width:650px) {
-      #champi-account .champi-auth-cards {
-        grid-template-columns:1fr !important;
-      }
+    #champi-account .champi-auth-cards {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:18px;
+      align-items:start;
+    }
+    #champi-account input:focus {
+      outline:2px solid #d6ae69;
+      outline-offset:2px;
     }
     #champi-account button:disabled {
       opacity:.55;
       cursor:wait;
     }
-    #champi-account input:focus {
-      outline:2px solid #d6ae69;
-      outline-offset:1px;
+    #champi-account [hidden] {
+      display:none !important;
+    }
+    @media(max-width:650px) {
+      #champi-account {
+        padding:20px 16px !important;
+      }
+      #champi-account .champi-auth-cards {
+        grid-template-columns:1fr !important;
+        gap:14px;
+      }
+      #champi-account h2 {
+        font-size:24px !important;
+      }
     }
   `;
-  cards.className = "champi-auth-cards";
+  document.head.append(style);
 
-  const status = node(
-    "p",
-    "Vous n'êtes pas connecté."
-  );
+  // Message de statut.
+  const status = node("p", "Vous n'êtes pas connecté.");
   status.id = "champi-auth-status";
   status.setAttribute("aria-live", "polite");
   status.style.cssText =
-    "margin:16px 0 0;padding:10px 12px;border-radius:8px;background:#f3f1e8;color:#536456;font:14px/1.5 Arial,sans-serif";
+    "margin:16px 0 0;padding:12px;border-radius:9px;background:#eeeee5;color:#536456;font:14px/1.5 Arial,sans-serif";
 
-  // Formulaire de récupération du mot de passe.
+  // Réinitialisation du mot de passe.
   const resetArea = node("div");
   resetArea.id = "champi-reset-area";
   resetArea.hidden = true;
   resetArea.style.cssText =
-    "max-width:520px;margin:18px auto 0;padding:18px;background:#fffefa;border:1px solid #dedfd2;border-radius:12px";
+    "max-width:550px;margin:18px auto;padding:18px;background:#fffefa;border:1px solid #dedfd2;border-radius:14px";
 
   const resetTitle = node("h3", "Choisir un nouveau mot de passe");
   resetTitle.style.color = "#183d2c";
@@ -243,12 +271,12 @@ function setupPanel() {
     saveNewPassword
   );
 
-  // Espace visible après connexion.
+  // Espace du membre connecté.
   const connectedArea = node("div");
   connectedArea.id = "champi-connected-area";
   connectedArea.hidden = true;
   connectedArea.style.cssText =
-    "margin-top:18px;padding:18px;background:#fffefa;border:1px solid #dedfd2;border-radius:12px";
+    "margin-top:18px;padding:18px;background:#fffefa;border:1px solid #dedfd2;border-radius:14px";
 
   const connectedTitle = node("h3", "Votre espace");
   connectedTitle.style.color = "#183d2c";
@@ -274,7 +302,7 @@ function setupPanel() {
 
   panel.append(container);
 
-  // Position réelle : juste après le bandeau, avant le visuel d'accueil.
+  // Position en haut, immédiatement après le bandeau du site.
   main.prepend(panel);
 }
 
@@ -308,9 +336,7 @@ async function loadMine(user) {
     .limit(30);
 
   if (error) {
-    list.append(
-      node("p", "Impossible de charger votre carnet.")
-    );
+    list.append(node("p", "Impossible de charger votre carnet."));
     console.error(error);
     return;
   }
@@ -403,9 +429,7 @@ async function saveObservation(user, status, button) {
 
     if (error) {
       if (photoPath) {
-        await supabase.storage
-          .from(BUCKET)
-          .remove([photoPath]);
+        await supabase.storage.from(BUCKET).remove([photoPath]);
       }
       throw error;
     }
@@ -437,6 +461,10 @@ async function start() {
   const signupPassword = $("champi-signup-password");
   const signupConfirm = $("champi-signup-confirm");
 
+  const signupForm = $("champi-signup-form");
+  const signupStart = $("champi-show-signup");
+  const signupCancel = $("champi-signup-cancel");
+
   const loginButton = $("champi-login-button");
   const signupButton = $("champi-signup-button");
   const forgotButton = $("champi-forgot-button");
@@ -461,9 +489,7 @@ async function start() {
     !status ||
     !create
   ) {
-    console.error(
-      "Intégration Champi : éléments HTML attendus introuvables."
-    );
+    console.error("Intégration Champi : éléments HTML introuvables.");
     return;
   }
 
@@ -478,20 +504,11 @@ async function start() {
   function showRecoveryMode(show) {
     recoveryMode = show;
     resetArea.hidden = !show;
-
-    document.querySelectorAll(
-      "#champi-account .champi-auth-cards"
-    ).forEach(element => {
-      element.hidden = show;
-    });
-
+    $("champi-account").querySelector(".champi-auth-cards").hidden = show;
     connectedArea.hidden = true;
 
     if (show) {
-      message(
-        status,
-        "Choisissez un nouveau mot de passe pour votre compte."
-      );
+      message(status, "Choisissez un nouveau mot de passe pour votre compte.");
     }
   }
 
@@ -501,67 +518,56 @@ async function start() {
     if (recoveryMode) return;
 
     connectedArea.hidden = !user;
-
-    document.querySelectorAll(
-      "#champi-account .champi-auth-cards"
-    ).forEach(element => {
-      element.hidden = !!user;
-    });
-
+    $("champi-account").querySelector(".champi-auth-cards").hidden = !!user;
     resetArea.hidden = true;
 
     if (user) {
-      message(
-        status,
-        "Connecté : " + (user.email || "compte actif")
-      );
-
-      message(
-        saveStatus,
-        "Vous pouvez enregistrer votre observation."
-      );
-
+      signupForm.hidden = true;
+      message(status, "Connecté : " + (user.email || "compte actif"));
+      message(saveStatus, "Vous pouvez enregistrer votre observation.");
       await loadMine(user);
     } else {
       message(status, "Vous n'êtes pas connecté.");
-
-      message(
-        saveStatus,
-        "Connectez-vous pour enregistrer une observation."
-      );
-
+      message(saveStatus, "Connectez-vous pour enregistrer une observation.");
       $("champi-my-observations").replaceChildren();
     }
   }
 
-  // CONNEXION : e-mail et un seul mot de passe.
+  // Afficher le formulaire d'inscription uniquement sur demande.
+  signupStart.addEventListener("click", () => {
+    signupForm.hidden = false;
+    signupStart.hidden = true;
+    signupEmail.focus();
+  });
+
+  signupCancel.addEventListener("click", () => {
+    signupForm.hidden = true;
+    signupStart.hidden = false;
+    signupEmail.value = "";
+    signupPassword.value = "";
+    signupConfirm.value = "";
+    message(status, "Création de compte annulée.");
+  });
+
+  // Connexion : un seul mot de passe.
   loginButton.addEventListener("click", async () => {
     if (!loginEmail.value.trim() || !loginPassword.value) {
-      message(
-        status,
-        "Saisissez votre adresse e-mail et votre mot de passe.",
-        true
-      );
+      message(status, "Saisissez votre adresse e-mail et votre mot de passe.", true);
       return;
     }
 
     loginButton.disabled = true;
     message(status, "Connexion en cours…");
 
-    const { data, error } = await supabase.auth
-      .signInWithPassword({
-        email: loginEmail.value.trim(),
-        password: loginPassword.value
-      });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: loginEmail.value.trim(),
+      password: loginPassword.value
+    });
 
     loginButton.disabled = false;
 
     if (error) {
-      message(
-        status,
-        "Connexion impossible. Vérifiez vos identifiants.",
-        true
-      );
+      message(status, "Connexion impossible. Vérifiez vos identifiants.", true);
       console.error(error);
       return;
     }
@@ -569,7 +575,7 @@ async function start() {
     await render(data.session);
   });
 
-  // CRÉATION : e-mail, mot de passe et confirmation.
+  // Création : e-mail, mot de passe et confirmation.
   signupButton.addEventListener("click", async () => {
     if (!signupEmail.value.trim()) {
       message(status, "Saisissez votre adresse e-mail.", true);
@@ -578,21 +584,13 @@ async function start() {
     }
 
     if (signupPassword.value.length < 8) {
-      message(
-        status,
-        "Le mot de passe doit contenir au moins 8 caractères.",
-        true
-      );
+      message(status, "Le mot de passe doit contenir au moins 8 caractères.", true);
       signupPassword.focus();
       return;
     }
 
     if (signupPassword.value !== signupConfirm.value) {
-      message(
-        status,
-        "Les deux mots de passe ne correspondent pas.",
-        true
-      );
+      message(status, "Les deux mots de passe ne correspondent pas.", true);
       signupConfirm.focus();
       return;
     }
@@ -611,53 +609,40 @@ async function start() {
     signupButton.disabled = false;
 
     if (error) {
-      message(
-        status,
-        "Création du compte impossible. Vérifiez les informations.",
-        true
-      );
+      message(status, "Création du compte impossible. Vérifiez les informations.", true);
       console.error(error);
       return;
     }
 
     signupPassword.value = "";
     signupConfirm.value = "";
+    signupForm.hidden = true;
+    signupStart.hidden = false;
 
     if (data.session) {
       await render(data.session);
     } else {
-      message(
-        status,
-        "Compte créé. Vérifiez votre e-mail pour confirmer l'inscription."
-      );
+      message(status, "Compte créé. Vérifiez votre e-mail pour confirmer l'inscription.");
     }
   });
 
-  // MOT DE PASSE OUBLIÉ : utilise l'adresse de la carte connexion.
+  // Mot de passe oublié.
   forgotButton.addEventListener("click", async () => {
     if (!loginEmail.value.trim()) {
-      message(
-        status,
-        "Saisissez votre adresse e-mail dans la carte de connexion.",
-        true
-      );
+      message(status, "Saisissez votre adresse e-mail dans la carte de connexion.", true);
       loginEmail.focus();
       return;
     }
 
     message(status, "Envoi du lien de réinitialisation…");
 
-    const { error } = await supabase.auth
-      .resetPasswordForEmail(loginEmail.value.trim(), {
-        redirectTo: SITE_URL
-      });
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      loginEmail.value.trim(),
+      { redirectTo: SITE_URL }
+    );
 
     if (error) {
-      message(
-        status,
-        "Impossible d'envoyer le lien. Vérifiez l'adresse e-mail et réessayez.",
-        true
-      );
+      message(status, "Impossible d'envoyer le lien. Vérifiez l'adresse e-mail.", true);
       console.error(error);
       return;
     }
@@ -668,24 +653,16 @@ async function start() {
     );
   });
 
-  // ENREGISTREMENT DU NOUVEAU MOT DE PASSE.
+  // Enregistrer le nouveau mot de passe.
   saveNewPassword.addEventListener("click", async () => {
     if (newPassword.value.length < 8) {
-      message(
-        status,
-        "Le nouveau mot de passe doit contenir au moins 8 caractères.",
-        true
-      );
+      message(status, "Le nouveau mot de passe doit contenir au moins 8 caractères.", true);
       newPassword.focus();
       return;
     }
 
     if (newPassword.value !== newPasswordConfirm.value) {
-      message(
-        status,
-        "Les deux nouveaux mots de passe ne correspondent pas.",
-        true
-      );
+      message(status, "Les deux nouveaux mots de passe ne correspondent pas.", true);
       newPasswordConfirm.focus();
       return;
     }
@@ -700,31 +677,20 @@ async function start() {
     saveNewPassword.disabled = false;
 
     if (error) {
-      message(
-        status,
-        "La mise à jour a échoué. Demandez un nouveau lien et réessayez.",
-        true
-      );
+      message(status, "La mise à jour a échoué. Demandez un nouveau lien et réessayez.", true);
       console.error(error);
       return;
     }
 
     newPassword.value = "";
     newPasswordConfirm.value = "";
-
     showRecoveryMode(false);
 
-    await render(
-      (await supabase.auth.getSession()).data.session
-    );
-
-    message(
-      status,
-      "Votre mot de passe a été modifié."
-    );
+    await render((await supabase.auth.getSession()).data.session);
+    message(status, "Votre mot de passe a été modifié.");
   });
 
-  // DÉCONNEXION.
+  // Déconnexion.
   logout.addEventListener("click", async () => {
     const { error } = await supabase.auth.signOut();
 
@@ -737,14 +703,10 @@ async function start() {
     await render(null);
   });
 
-  // ENREGISTREMENT D'UNE OBSERVATION.
+  // Enregistrement d'une observation.
   create.addEventListener("click", async () => {
     if (!user) {
-      message(
-        saveStatus,
-        "Connectez-vous avant d'enregistrer.",
-        true
-      );
+      message(saveStatus, "Connectez-vous avant d'enregistrer.", true);
       return;
     }
 
@@ -768,9 +730,7 @@ async function start() {
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", start, {
-    once: true
-  });
+  document.addEventListener("DOMContentLoaded", start, { once: true });
 } else {
   start();
 }
