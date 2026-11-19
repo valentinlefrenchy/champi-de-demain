@@ -51,7 +51,7 @@ function setupPanel() {
 
   const email = makeInput("champi-email", "email", "Adresse e-mail", "email");
   const password = makeInput("champi-password", "password", "Mot de passe (8 caractères minimum)", "current-password");
-  const passwordConfirm = makeInput("champi-password-confirm", "password", "Confirmer le mot de passe", "new-password");
+  const passwordConfirm passwordConfirm.hidden = true;= makeInput("champi-password-confirm", "password", "Confirmer le mot de passe", "new-password");
   const login = makeButton("champi-login", "Se connecter", "btn");
   const signup = makeButton("champi-signup", "Créer mon compte", "btn secondary");
   const forgot = makeButton("champi-forgot", "Mot de passe oublié ?", "btn secondary");
