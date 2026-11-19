@@ -12,6 +12,9 @@
 <meta property="og:locale" content="fr_FR">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍄%3C/text%3E%3C/svg%3E">
 <title>Champi de Demain — Explorer la nature</title>
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{--forest:#183d2c;--cream:#f6f3e9;--gold:#d6ae69;--ink:#26352b;--muted:#667267;--paper:#fffefa}
 *{box-sizing:border-box}
@@ -422,7 +425,29 @@ nav a:focus-visible,footer a:focus-visible,.hero .btn:focus-visible{outline-colo
 
 <button class="btn" id="create-observation" type="button">Créer ma fiche d’observation</button>
 <div id="observation-result" class="data-status" aria-live="polite"></div>
-</div>
+</div><section id="community-discoveries">
+  <h2>Carte des découvertes</h2>
+  <p class="intro">
+    Explorez les découvertes partagées par la communauté
+    ou retrouvez vos propres observations.
+  </p>
+
+  <button class="btn" id="show-public-map" type="button">
+    🌍 Carte communautaire
+  </button>
+
+  <button class="btn" id="show-personal-map" type="button">
+    🔒 Ma carte personnelle
+  </button>
+
+  <p id="community-map-status" class="note" aria-live="polite">
+    Choisissez une carte.
+  </p>
+
+  <div id="community-map"
+       style="height:420px;border-radius:16px;overflow:hidden">
+  </div>
+</section>
 </section>
 
 <section id="securite">
