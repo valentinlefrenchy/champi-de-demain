@@ -434,8 +434,7 @@ async function loadDiscoveries(mode) {
 
   const status = $("community-map-status");
 
-  status.textContent =
-    "Chargement des découvertes...";
+  status.textContent = "Chargement des découvertes...";
 
   let query = supabase
     .from("observations")
@@ -448,10 +447,14 @@ async function loadDiscoveries(mode) {
       latitude,
       longitude,
       visibility,
-      status
+      status,
+      user_id
     `);
 
-  /* CARTE PUBLIQUE */
+  /* =====================================================
+     CARTE COMMUNAUTAIRE
+     Uniquement observations publiques approuvées
+  ===================================================== */
 
   if (mode === "public") {
 
@@ -461,7 +464,10 @@ async function loadDiscoveries(mode) {
 
   }
 
-  /* CARTE PERSONNELLE */
+  /* =====================================================
+     CARTE PERSONNELLE
+     Observations appartenant à l'utilisateur connecté
+  ===================================================== */
 
   if (mode === "personal") {
 
@@ -486,6 +492,10 @@ async function loadDiscoveries(mode) {
 
   }
 
+  /* =====================================================
+     REQUETE SUPABASE
+  ===================================================== */
+
   const {
     data,
     error
@@ -499,10 +509,10 @@ async function loadDiscoveries(mode) {
 
   if (error) {
 
-    console.error(error);
+    console.error("Erreur Supabase :", error);
 
     status.textContent =
-      "Impossible de charger les découvertes.";
+      "Erreur lors du chargement des observations.";
 
     return;
 
@@ -513,7 +523,7 @@ async function loadDiscoveries(mode) {
     status.textContent =
       mode === "public"
         ? "Aucune découverte publique validée pour le moment."
-        : "Votre carte personnelle ne contient aucune découverte géolocalisée.";
+        : "Votre carte personnelle ne contient aucune observation géolocalisée.";
 
     return;
 
@@ -521,15 +531,14 @@ async function loadDiscoveries(mode) {
 
   const coordinates = [];
 
-  /* MARQUEURS */
+  /* =====================================================
+     CREATION DES MARQUEURS
+  ===================================================== */
 
   for (const observation of data) {
 
-    const latitude =
-      Number(observation.latitude);
-
-    const longitude =
-      Number(observation.longitude);
+    let latitude = Number(observation.latitude);
+    let longitude = Number(observation.longitude);
 
     if (
       !Number.isFinite(latitude) ||
@@ -538,10 +547,34 @@ async function loadDiscoveries(mode) {
       continue;
     }
 
+    /* =================================================
+       CONFIDENTIALITE GPS
+
+       Carte publique :
+       approximation de plusieurs kilomètres.
+
+       Carte personnelle :
+       coordonnées exactes.
+    ================================================= */
+
+    if (mode === "public") {
+
+      latitude =
+        Math.round(latitude / 0.03) * 0.03;
+
+      longitude =
+        Math.round(longitude / 0.03) * 0.03;
+
+    }
+
     const marker = L.marker([
       latitude,
       longitude
     ]);
+
+    /* =================================================
+       POPUP SECURISEE
+    ================================================= */
 
     const popup = document.createElement("div");
 
@@ -556,8 +589,7 @@ async function loadDiscoveries(mode) {
     date.textContent =
       observation.observation_date
         ? new Date(
-            observation.observation_date +
-            "T12:00:00"
+            observation.observation_date + "T12:00:00"
           ).toLocaleDateString("fr-FR")
         : "Date inconnue";
 
@@ -567,9 +599,17 @@ async function loadDiscoveries(mode) {
       observation.description ||
       "Aucune description renseignée.";
 
+    const privacy = document.createElement("small");
+
+    privacy.textContent =
+      mode === "public"
+        ? "📍 Position approximative pour protéger les lieux de découverte."
+        : "🔒 Position exacte de votre observation.";
+
     popup.appendChild(title);
     popup.appendChild(date);
     popup.appendChild(description);
+    popup.appendChild(privacy);
 
     marker.bindPopup(popup);
 
@@ -582,28 +622,35 @@ async function loadDiscoveries(mode) {
 
   }
 
+  /* =====================================================
+     ADAPTATION DE LA CARTE
+  ===================================================== */
+
   if (coordinates.length > 0) {
 
     discoveriesMap.fitBounds(
       coordinates,
       {
         padding: [30, 30],
-        maxZoom: 12
+        maxZoom: mode === "public" ? 10 : 14
       }
     );
 
   }
 
+  /* =====================================================
+     MESSAGE
+  ===================================================== */
+
   status.textContent =
     coordinates.length +
     (
       mode === "public"
-        ? " découverte(s) publique(s) validée(s)."
+        ? " découverte(s) publique(s) validée(s). Positions approximatives."
         : " découverte(s) dans votre carte personnelle."
     );
 
 }
-
 /* =========================================================
    BOUTONS
 ========================================================= */
