@@ -366,7 +366,27 @@ nav a:focus-visible,footer a:focus-visible,.hero .btn:focus-visible{outline-colo
 <input id="obs-photo" type="file" accept="image/*">
 <p class="note">L’aperçu reste sur votre appareil. Si vous êtes connecté et que vous enregistrez votre fiche, la photo sera envoyée de façon sécurisée dans votre espace privé, en attente de modération.</p>
 <img id="obs-photo-preview" alt="Aperçu de votre photo" hidden style="width:100%;max-width:500px;border-radius:12px;margin:15px 0;">
-<img id="obs-photo-preview" alt="Aperçu de votre photo" hidden style="width:100%;max-width:500px;border-radius:12px;margin:15px 0;">
+
+<label for="obs-datetime"><strong>Date et heure de la découverte</strong></label>
+<input id="obs-datetime" type="datetime-local">
+
+<label for="obs-postal"><strong>Code postal</strong></label>
+<input id="obs-postal" inputmode="numeric" maxlength="5" placeholder="Exemple : 82100">
+
+<label for="obs-town"><strong>Commune ou secteur</strong></label>
+<input id="obs-town" type="text" maxlength="100" placeholder="Nom de la commune">
+
+<strong>Visibilité de la découverte</strong>
+<label><input type="radio" name="obs-visibility" value="private" checked> 🔒 Privée — moi uniquement</label>
+<label><input type="radio" name="obs-visibility" value="public"> 🌍 Publique — après modération</label>
+
+<p class="note">La position publique sera approximative pour protéger les lieux de découverte.</p>
+
+<button type="button" class="btn" id="obs-geolocate">Utiliser ma position GPS</button>
+<div id="obs-location-map" style="height:300px;border-radius:14px;margin:15px 0"></div>
+<input type="hidden" id="obs-latitude">
+<input type="hidden" id="obs-longitude">
+<p id="obs-location-status" class="note">Aucun emplacement sélectionné.</p>
 <label for="obs-habitat"><strong>1. Où l'avez-vous trouvé ?</strong></label>
 <select id="obs-habitat">
 <option value="">Choisir un milieu</option>
