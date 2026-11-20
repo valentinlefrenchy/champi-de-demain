@@ -436,7 +436,49 @@ async function loadDiscoveries(mode) {
 
   status.textContent = "Chargement des découvertes...";
 
-  let query = supabase
+  /* =========================================================
+   REQUÊTE OBSERVATIONS
+========================================================= */
+
+let query;
+
+/* CARTE PUBLIQUE : coordonnées approximatives */
+
+if (mode === "public") {
+
+  query = supabase
+    .from("public_observations")
+    .select(`
+      id,
+      observation_date,
+      observed_at,
+      description,
+      approximate_location,
+      latitude,
+      longitude
+    `);
+
+}
+
+/* CARTE PERSONNELLE : coordonnées exactes */
+
+if (mode === "personal") {
+
+  const {
+    data: authData,
+    error: authError
+  } = await supabase.auth.getUser();
+
+  if (authError || !authData?.user) {
+
+    status.textContent =
+      "Connectez-vous pour consulter votre carte personnelle.";
+
+    return;
+
+  }
+
+  query = supabase
     .from("observations")
     .select(`
       id,
@@ -449,39 +491,10 @@ async function loadDiscoveries(mode) {
       visibility,
       status,
       user_id
-    `);
+    `)
+    .eq("user_id", authData.user.id);
 
-  /* =====================================================
-     CARTE COMMUNAUTAIRE
-     Uniquement observations publiques approuvées
-  ===================================================== */
-
-  if (mode === "public") {
-
-    query = query
-      .eq("visibility", "public")
-      .eq("status", "approved");
-
-  }
-
-  /* =====================================================
-     CARTE PERSONNELLE
-     Observations appartenant à l'utilisateur connecté
-  ===================================================== */
-
-  if (mode === "personal") {
-
-    const {
-      data: authData,
-      error: authError
-    } = await supabase.auth.getUser();
-
-    if (authError || !authData?.user) {
-
-      status.textContent =
-        "Connectez-vous pour consulter votre carte personnelle.";
-
-      return;
+}
 
     }
 
