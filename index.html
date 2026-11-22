@@ -306,6 +306,8 @@ function updateObservationPosition(latitude, longitude) {
   $("obs-latitude").value = latitude;
   $("obs-longitude").value = longitude;
 
+  $("lat").value = latitude;
+  $("lng").value = longitude;
   $("obs-location-status").textContent =
     "Position sélectionnée sur la carte.";
 
