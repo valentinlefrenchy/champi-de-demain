@@ -208,19 +208,55 @@
   <section class="card">
     <h2>📓 Mon carnet d'observation</h2>
 
-    <p>
-      Cette fonctionnalité sera reliée à votre compte utilisateur
-      pour sauvegarder vos observations.
-    </p>
+<section class="card">
+  <h2>👤 Mon compte</h2>
 
-    <div class="warning">
-      ⚠️ Une identification de champignon à partir d'une photographie
-      ne garantit jamais sa comestibilité. Ne consommez jamais un
-      champignon sur la seule base d'une identification numérique.
-    </div>
-  </section>
+  <div id="auth">
+    <input id="email" type="email" placeholder="Adresse e-mail">
+    <input id="password" type="password" placeholder="Mot de passe">
 
-</main>
+    <button id="signup" type="button">Créer un compte</button>
+    <button id="login" type="button">Se connecter</button>
+  </div>
+
+  <div id="account" hidden>
+    <p>Connecté : <strong id="account-label"></strong></p>
+    <button id="logout" type="button">Se déconnecter</button>
+  </div>
+
+  <p id="auth-status"></p>
+</section>
+
+<section class="card">
+  <h2>📓 Ajouter une observation</h2>
+
+  <form id="observation-form">
+    <input id="date" type="date">
+    <input id="place" type="text" placeholder="Lieu (facultatif)">
+
+    <textarea id="description"
+      placeholder="Décrivez votre observation"
+      rows="4"></textarea>
+
+    <select id="visibility">
+      <option value="private">🔒 Privée</option>
+      <option value="public">🌍 Publique (position approximative)</option>
+    </select>
+
+    <input id="photo" type="file" accept="image/*">
+    <div id="preview"></div>
+
+    <button type="submit">💾 Enregistrer l'observation</button>
+  </form>
+
+  <p id="obs-status"></p>
+</section>
+
+<section class="card">
+  <h2>Mes observations</h2>
+  <p id="mine-status"></p>
+  <div id="mine"></div>
+</section>
 
 <footer>
   🍄 Champi de Demain — Observer la nature, apprendre et partager
